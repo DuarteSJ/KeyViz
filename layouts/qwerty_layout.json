@@ -1,0 +1,68 @@
+{
+    "keys": [
+        {"label": "~", "key_bind": "grave", "x": 20, "y": 20, "width": 40, "height": 40},
+        {"label": "1", "key_bind": "1", "x": 70, "y": 20, "width": 40, "height": 40},
+        {"label": "2", "key_bind": "2", "x": 120, "y": 15, "width": 40, "height": 40},
+        {"label": "3", "key_bind": "3", "x": 170, "y": 10, "width": 40, "height": 40},
+        {"label": "4", "key_bind": "4", "x": 220, "y": 15, "width": 40, "height": 40},
+        {"label": "5", "key_bind": "5", "x": 270, "y": 20, "width": 40, "height": 40},
+        
+        {"label": "6", "key_bind": "6", "x": 490, "y": 20, "width": 40, "height": 40},
+        {"label": "7", "key_bind": "7", "x": 540, "y": 15, "width": 40, "height": 40},
+        {"label": "8", "key_bind": "8", "x": 590, "y": 10, "width": 40, "height": 40},
+        {"label": "9", "key_bind": "9", "x": 640, "y": 15, "width": 40, "height": 40},
+        {"label": "0", "key_bind": "0", "x": 690, "y": 20, "width": 40, "height": 40},
+        
+        {"label": "Q", "key_bind": "q", "x": 20, "y": 70, "width": 40, "height": 40},
+        {"label": "W", "key_bind": "w", "x": 70, "y": 70, "width": 40, "height": 40},
+        {"label": "E", "key_bind": "e", "x": 120, "y": 65, "width": 40, "height": 40},
+        {"label": "R", "key_bind": "r", "x": 170, "y": 60, "width": 40, "height": 40},
+        {"label": "T", "key_bind": "t", "x": 220, "y": 65, "width": 40, "height": 40},
+        
+        {"label": "Y", "key_bind": "y", "x": 490, "y": 65, "width": 40, "height": 40},
+        {"label": "U", "key_bind": "u", "x": 540, "y": 60, "width": 40, "height": 40},
+        {"label": "I", "key_bind": "i", "x": 590, "y": 65, "width": 40, "height": 40},
+        {"label": "O", "key_bind": "o", "x": 640, "y": 70, "width": 40, "height": 40},
+        {"label": "P", "key_bind": "p", "x": 690, "y": 70, "width": 40, "height": 40},
+        
+        {"label": "A", "key_bind": "a", "x": 20, "y": 120, "width": 40, "height": 40},
+        {"label": "S", "key_bind": "s", "x": 70, "y": 120, "width": 40, "height": 40},
+        {"label": "D", "key_bind": "d", "x": 120, "y": 115, "width": 40, "height": 40},
+        {"label": "F", "key_bind": "f", "x": 170, "y": 110, "width": 40, "height": 40},
+        {"label": "G", "key_bind": "g", "x": 220, "y": 115, "width": 40, "height": 40},
+        
+        {"label": "H", "key_bind": "h", "x": 490, "y": 115, "width": 40, "height": 40},
+        {"label": "J", "key_bind": "j", "x": 540, "y": 110, "width": 40, "height": 40},
+        {"label": "K", "key_bind": "k", "x": 590, "y": 115, "width": 40, "height": 40},
+        {"label": "L", "key_bind": "l", "x": 640, "y": 120, "width": 40, "height": 40},
+        {"label": ";", "key_bind": "semicolon", "x": 690, "y": 120, "width": 40, "height": 40},
+        
+        {"label": "Z", "key_bind": "z", "x": 20, "y": 170, "width": 40, "height": 40},
+        {"label": "X", "key_bind": "x", "x": 70, "y": 170, "width": 40, "height": 40},
+        {"label": "C", "key_bind": "c", "x": 120, "y": 165, "width": 40, "height": 40},
+        {"label": "V", "key_bind": "v", "x": 170, "y": 160, "width": 40, "height": 40},
+        {"label": "B", "key_bind": "b", "x": 220, "y": 165, "width": 40, "height": 40},
+        
+        {"label": "N", "key_bind": "n", "x": 490, "y": 165, "width": 40, "height": 40},
+        {"label": "M", "key_bind": "m", "x": 540, "y": 160, "width": 40, "height": 40},
+        {"label": ",", "key_bind": "comma", "x": 590, "y": 165, "width": 40, "height": 40},
+        {"label": ".", "key_bind": "period", "x": 640, "y": 170, "width": 40, "height": 40},
+        {"label": "/", "key_bind": "slash", "x": 690, "y": 170, "width": 40, "height": 40},
+        
+        {"label": "LCtrl", "key_bind": "control_l", "x": 170, "y": 260, "width": 50, "height": 40},
+        {"label": "Bksp", "key_bind": "backspace", "x": 230, "y": 260, "width": 50, "height": 40},
+        {"label": "LGui", "key_bind": "super", "x": 290, "y": 260, "width": 50, "height": 40},
+        
+        {"label": "Enter", "key_bind": "return", "x": 420, "y": 260, "width": 50, "height": 40},
+        {"label": "Space", "key_bind": "space", "x": 480, "y": 260, "width": 50, "height": 40},
+        {"label": "LAlt", "key_bind": "alt_l", "x": 540, "y": 260, "width": 50, "height": 40},
+        
+        {"label": "TG(2)", "key_bind": "f13", "x": 20, "y": 220, "width": 50, "height": 40},
+        {"label": "TG(3)", "key_bind": "f14", "x": 80, "y": 220, "width": 50, "height": 40},
+        {"label": "LGui", "key_bind": "super", "x": 140, "y": 220, "width": 50, "height": 40},
+        {"label": "LAlt", "key_bind": "alt_l", "x": 200, "y": 220, "width": 50, "height": 40},
+        
+        {"label": "TT(2)", "key_bind": "f15", "x": 230, "y": 320, "width": 50, "height": 40},
+        {"label": "TT(3)", "key_bind": "f16", "x": 480, "y": 320, "width": 50, "height": 40}
+    ]
+}
