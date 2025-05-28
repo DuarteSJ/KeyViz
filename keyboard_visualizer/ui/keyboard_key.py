@@ -1,12 +1,9 @@
-"""
-Key widget for displaying individual keyboard keys
-"""
-from PyQt6.QtWidgets import QWidget, QInputDialog
+from PyQt6.QtWidgets import QWidget, QInputDialog, QDialog
 from PyQt6.QtCore import Qt, QPoint, QRect
 from PyQt6.QtGui import QPainter, QColor, QPen, QPainterPath, QRadialGradient
-import json
+from .dialogs import KeyBindDialog
 
-class KeyWidget(QWidget):
+class KeyboardKey(QWidget):
     def __init__(self, label="", key_bind="", keyboard_manager=None, parent=None):
         super().__init__(parent)
         self.label = label
@@ -128,7 +125,7 @@ class KeyWidget(QWidget):
             painter.fillRect(0, self.height() - handle_size, handle_size, handle_size, handle_color)
             painter.fillRect(self.width() - handle_size, self.height() - handle_size, 
                            handle_size, handle_size, handle_color)
-                           
+
     def getResizeHandle(self, pos):
         """Return which resize handle the position is over, if any."""
         handle_size = 6
@@ -228,7 +225,7 @@ class KeyWidget(QWidget):
                     self.setCursor(Qt.CursorShape.SizeBDiagCursor)
                 else:
                     self.setCursor(Qt.CursorShape.ArrowCursor)
-                    
+
     def mouseDoubleClickEvent(self, event):
         if self.parent().editor_mode:
             # Get new label
@@ -237,26 +234,7 @@ class KeyWidget(QWidget):
             if ok:
                 self.label = new_label
                 # Get key binding
-                if self.keyboard_manager:
-                    # Write wait_key command
-                    with open(self.keyboard_manager.command_file, 'w') as f:
-                        json.dump({'type': 'wait_key'}, f)
-                    
-                    # Wait for response
-                    while not self.keyboard_manager.response_file.exists():
-                        continue
-                    
-                    # Read the response
-                    try:
-                        with open(self.keyboard_manager.response_file, 'r') as f:
-                            response = json.load(f)
-                            key = response.get('key')
-                            if key:
-                                self.key_bind = key
-                    except Exception as e:
-                        print(f"Error editing key: {e}")
-                    finally:
-                        # Clean up response file
-                        if self.keyboard_manager.response_file.exists():
-                            self.keyboard_manager.response_file.unlink()
+                dialog = KeyBindDialog(self.keyboard_manager, self)
+                if dialog.exec() == QDialog.DialogCode.Accepted and dialog.key_name:
+                    self.key_bind = dialog.key_name
                 self.update() 

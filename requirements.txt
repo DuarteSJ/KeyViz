@@ -1,2 +1,2 @@
-PyQt6==6.6.1
-evdev==1.6.1 
+PyQt6>=6.4.0
+keyboard==0.13.5 

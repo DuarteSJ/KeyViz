@@ -1,14 +1,11 @@
-"""
-Main application window
-"""
 import sys
 import json
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QPushButton,
                             QVBoxLayout, QHBoxLayout, QMessageBox,
                             QFileDialog)
 from PyQt6.QtCore import QTimer, Qt
-from .canvas import KeyboardCanvas
-from ..input.keyboard_manager import KeyboardManager
+from .keyboard_canvas import KeyboardCanvas
+from ..core.keyboard_manager import KeyboardManager
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -41,22 +38,16 @@ class MainWindow(QMainWindow):
         # Initialize keyboard manager
         self.keyboard_manager = KeyboardManager()
         
+        # Get authentication
+        if not self.keyboard_manager.authenticate():
+            QMessageBox.critical(self, "Error", 
+                               "Authentication required to monitor keyboard input.")
+            sys.exit(1)
+            
         # Start the keyboard helper
-        try:
-            if not self.keyboard_manager.start():
-                error_msg = (
-                    "Failed to start keyboard helper. This could be due to permission issues.\n\n"
-                    "To fix this, you need to either:\n"
-                    "1. Add your user to the 'input' group:\n"
-                    "   sudo usermod -a -G input $USER\n"
-                    "   (requires logout/login to take effect)\n\n"
-                    "2. Or run the application with sudo:\n"
-                    "   sudo python main.py"
-                )
-                QMessageBox.critical(self, "Error", error_msg)
-                sys.exit(1)
-        except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to start keyboard helper: {str(e)}")
+        if not self.keyboard_manager.start():
+            QMessageBox.critical(self, "Error", 
+                               "Failed to start keyboard helper.")
             sys.exit(1)
         
         # Create main widget and layout
@@ -102,9 +93,7 @@ class MainWindow(QMainWindow):
             self.toggle_mode_btn.setText("Start Visualizer")
             for widget in editor_widgets:
                 widget.setEnabled(True)
-            # Stop monitoring
-            with open(self.keyboard_manager.command_file, 'w') as f:
-                json.dump({'type': 'stop_monitor'}, f)
+            self.keyboard_manager.stop_monitoring()
             self.canvas.setCursor(Qt.CursorShape.CrossCursor)
             self.state_check_timer.stop()
         else:
@@ -112,10 +101,9 @@ class MainWindow(QMainWindow):
             for widget in editor_widgets:
                 widget.setEnabled(False)
             # Start monitoring with current key bindings
-            key_binds = [key.key_bind for key in self.canvas.keys]
+            key_binds = [key.key_bind.lower() for key in self.canvas.keys]
             if key_binds:  # Only start monitoring if we have keys to monitor
-                with open(self.keyboard_manager.command_file, 'w') as f:
-                    json.dump({'type': 'monitor', 'keys': key_binds}, f)
+                self.keyboard_manager.start_monitoring(key_binds)
                 self.state_check_timer.start()
             self.canvas.setCursor(Qt.CursorShape.ArrowCursor)
             
@@ -137,17 +125,12 @@ class MainWindow(QMainWindow):
     def check_keyboard_state(self):
         if not self.canvas.editor_mode:  # Only check states in visualizer mode
             key_states = self.keyboard_manager.get_key_states()
-            # Create case-insensitive mapping
             key_map = {key.key_bind.lower(): key for key in self.canvas.keys}
             
-            # Update all keys first to ensure proper state
-            for key in self.canvas.keys:
-                key_bind = key.key_bind.lower()
-                if key_bind in key_states:
-                    key.pressed = key_states[key_bind]
-                else:
-                    key.pressed = False
-                key.update()
+            for key_name, is_pressed in key_states.items():
+                if key_name in key_map:
+                    key_map[key_name].pressed = is_pressed
+                    key_map[key_name].update()
                     
     def closeEvent(self, event):
         self.state_check_timer.stop()

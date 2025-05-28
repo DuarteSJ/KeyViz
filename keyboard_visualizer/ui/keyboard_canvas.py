@@ -1,11 +1,7 @@
-"""
-Canvas widget for displaying and editing keyboard layouts
-"""
-from PyQt6.QtWidgets import QWidget
-from PyQt6.QtCore import Qt, QPoint
-from PyQt6.QtGui import QCursor
-from .key import KeyWidget
-import json
+from PyQt6.QtWidgets import QWidget, QDialog
+from PyQt6.QtCore import Qt
+from .keyboard_key import KeyboardKey
+from .dialogs import KeyBindDialog
 
 class KeyboardCanvas(QWidget):
     def __init__(self, keyboard_manager, parent=None):
@@ -34,34 +30,15 @@ class KeyboardCanvas(QWidget):
                 self.clearSelection()
                 
             # Create new key at click position
-            if self.keyboard_manager:
-                # Write wait_key command
-                with open(self.keyboard_manager.command_file, 'w') as f:
-                    json.dump({'type': 'wait_key'}, f)
-                
-                # Wait for response
-                while not self.keyboard_manager.response_file.exists():
-                    continue
-                
-                # Read the response
-                try:
-                    with open(self.keyboard_manager.response_file, 'r') as f:
-                        response = json.load(f)
-                        key = response.get('key')
-                        if key:
-                            new_key = KeyWidget(key, key, self.keyboard_manager, self)
-                            pos = event.pos()
-                            pos.setX(pos.x() - new_key.width() // 2)
-                            pos.setY(pos.y() - new_key.height() // 2)
-                            new_key.move(pos)
-                            self.keys.append(new_key)
-                            new_key.show()
-                except Exception as e:
-                    print(f"Error creating key: {e}")
-                finally:
-                    # Clean up response file
-                    if self.keyboard_manager.response_file.exists():
-                        self.keyboard_manager.response_file.unlink()
+            dialog = KeyBindDialog(self.keyboard_manager, self)
+            if dialog.exec() == QDialog.DialogCode.Accepted and dialog.key_name:
+                key = KeyboardKey(dialog.key_name, dialog.key_name, self.keyboard_manager, self)
+                pos = event.pos()
+                pos.setX(pos.x() - key.width() // 2)
+                pos.setY(pos.y() - key.height() // 2)
+                key.move(pos)
+                self.keys.append(key)
+                key.show()
                 
     def clearSelection(self):
         """Clear selection from all keys."""
@@ -126,7 +103,7 @@ class KeyboardCanvas(QWidget):
     def loadConfiguration(self, config):
         self.clearKeys()
         for key_data in config['keys']:
-            key = KeyWidget(
+            key = KeyboardKey(
                 key_data['label'],
                 key_data.get('key_bind', ''),
                 self.keyboard_manager,

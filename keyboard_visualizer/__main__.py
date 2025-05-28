@@ -1,6 +1,4 @@
-"""
-Main entry point for the keyboard visualizer application
-"""
+#!/usr/bin/env python3
 import sys
 from PyQt6.QtWidgets import QApplication
 from .ui.main_window import MainWindow

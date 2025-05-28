@@ -1,40 +1,88 @@
 # Keyboard Visualizer
 
-A customizable keyboard layout visualizer that allows you to create, save, and visualize keyboard layouts with real-time keypress detection.
+A PyQt6-based application for visualizing keyboard input in real-time. Features a modern, 3D-styled interface with the Nord color scheme.
 
 ## Features
 
-- Create custom keyboard layouts by dragging and positioning keys
-- Customize key labels and sizes
-- Save and load keyboard configurations
-- Real-time keypress visualization
-- Support for any keyboard layout
+- Real-time keyboard input visualization
+- Custom keyboard layout editor
+- Save and load keyboard layouts
+- Modern 3D-styled keys with press animations
+- Nord color scheme
+- Multi-key selection and movement
+- Key resizing with corner handles
+- Support for custom key labels and bindings
+
+## Requirements
+
+- Python 3.8 or higher
+- PyQt6
+- evdev (for Linux keyboard input)
+- sudo privileges (for keyboard monitoring)
 
 ## Installation
 
-1. Clone this repository
-2. Install the required dependencies:
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/keyboard-visualizer.git
+cd keyboard-visualizer
+```
+
+2. Create a virtual environment (optional but recommended):
+```bash
+python -m venv venv
+source venv/bin/activate  # On Linux/macOS
+# or
+venv\Scripts\activate  # On Windows
+```
+
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
-```
-3. Run the application:
-```bash
-python main.py
 ```
 
 ## Usage
 
-1. **Editor Mode**:
-   - Click "New Key" to create a new key
-   - Drag keys to position them
-   - Double-click a key to edit its label
-   - Use the save button to store your configuration
+1. Start the application:
+```bash
+python -m keyboard_visualizer
+```
 
-2. **Visualizer Mode**:
-   - Load a saved configuration
-   - Keys will highlight when pressed
-   - Press ESC to exit
+2. When prompted, enter your sudo password to allow keyboard monitoring.
 
-## Note
+3. Use the editor mode to:
+   - Click anywhere to add new keys
+   - Drag keys to move them
+   - Ctrl+Click to select multiple keys
+   - Use corner handles to resize keys
+   - Double-click keys to edit their label and binding
+   - Right-click to delete keys
 
-This application requires root/admin privileges to detect keypresses system-wide. 
+4. Click "Start Visualizer" to begin monitoring keyboard input.
+
+5. Use "Save Layout" and "Load Layout" to persist your custom layouts.
+
+## Project Structure
+
+```
+keyboard_visualizer/
+├── core/               # Core functionality
+│   ├── __init__.py
+│   └── keyboard_manager.py
+├── ui/                # User interface components
+│   ├── __init__.py
+│   ├── dialogs.py
+│   ├── keyboard_canvas.py
+│   ├── keyboard_key.py
+│   └── main_window.py
+├── utils/             # Utility functions
+│   ├── __init__.py
+│   └── sudo_helper.py
+├── __init__.py
+├── __main__.py
+└── keyboard_helper.py
+```
+
+## License
+
+MIT License 
