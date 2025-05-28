@@ -36,8 +36,8 @@ class KeyboardHelper:
             nonlocal key_info
             if event.event_type == keyboard.KEY_DOWN:
                 key_info = {
-                    'scan_code': event.scan_code,
-                    'name': event.name,
+                    "scan_code": event.scan_code,
+                    "name": event.name,
                 }
                 keyboard.unhook_all()
 
@@ -100,7 +100,9 @@ class KeyboardHelper:
             except Exception as e:
                 # Only print error if enough time has passed since last error
                 current_time = time.time()
-                if current_time - self.last_error_time >= 5:  # Only print every 5 seconds
+                if (
+                    current_time - self.last_error_time >= 5
+                ):  # Only print every 5 seconds
                     print(f"Error in helper: {e}")
                     self.last_error_time = current_time
 
@@ -116,4 +118,3 @@ class KeyboardHelper:
 if __name__ == "__main__":
     helper = KeyboardHelper()
     helper.run()
- 

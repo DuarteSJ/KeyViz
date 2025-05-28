@@ -1,3 +1,3 @@
 """
-Utility functions and classes for the Keyboard Visualizer application.
+Utility functions and classes for the KeyViz application.
 """

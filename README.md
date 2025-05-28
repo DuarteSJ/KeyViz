@@ -1,6 +1,15 @@
-# Keyboard Visualizer
+# KeyViz
 
 A PyQt6-based application for visualizing keyboard input in real-time. Features a modern, 3D-styled interface with the Nord color scheme.
+
+## Screenshots
+
+### Regular QWERTY Layout
+![QWERTY](./img/regular_qwerty.png)
+
+### Dactyl-Manuform Layout
+![Dactyl-Manuform](./img/regular_qwerty.png)
+
 
 ## Features
 
@@ -12,6 +21,12 @@ A PyQt6-based application for visualizing keyboard input in real-time. Features 
 - Multi-key selection and movement
 - Key resizing with corner handles
 - Support for custom key labels and bindings
+
+## Incomming Features
+- Customizable key colors and styles
+- Enhanced key binding options
+- Ability to import and export layouts directly from .vil files
+
 
 ## Requirements
 

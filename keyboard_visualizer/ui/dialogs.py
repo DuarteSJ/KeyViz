@@ -19,7 +19,7 @@ class PasswordDialog(QDialog):
 
         # Add explanation label
         label = QLabel(
-            "Keyboard Visualizer needs elevated privileges to monitor keyboard input.\n"
+            "KeyViz needs elevated privileges to monitor keyboard input.\n"
             "Please enter your sudo password:"
         )
         layout.addWidget(label)

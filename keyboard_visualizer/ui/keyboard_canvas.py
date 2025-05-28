@@ -41,7 +41,7 @@ class KeyboardCanvas(QWidget):
                     dialog.key_info["name"],
                     dialog.key_info["name"],
                     None,  # Don't pass keyboard_manager to key
-                    self
+                    self,
                 )
                 key.scan_code = dialog.key_info["scan_code"]
                 pos = event.pos()
@@ -122,7 +122,7 @@ class KeyboardCanvas(QWidget):
                 key_data["label"],
                 key_data.get("key_bind", ""),
                 key_data.get("scan_code"),  # Pass scan_code directly
-                self  # Pass parent
+                self,  # Pass parent
             )
             key.setFixedSize(key_data["width"], key_data["height"])
             key.move(key_data["x"], key_data["y"])

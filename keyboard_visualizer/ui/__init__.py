@@ -1,3 +1,3 @@
 """
-UI components for the Keyboard Visualizer application.
+UI components for the KeyViz application.
 """

@@ -34,7 +34,7 @@ class PasswordDialog(QDialog):
 
         # Add explanation label
         label = QLabel(
-            "Keyboard Visualizer needs elevated privileges to monitor keyboard input.\n"
+            "KeyViz needs elevated privileges to monitor keyboard input.\n"
             "Please enter your sudo password:"
         )
         layout.addWidget(label)
@@ -512,7 +512,7 @@ class KeyboardCanvas(QWidget):
                     dialog.key_info["name"],
                     dialog.key_info["name"],
                     self.keyboard_manager,
-                    self
+                    self,
                 )
                 key.scan_code = dialog.key_info["scan_code"]
                 pos = event.pos()
@@ -602,7 +602,7 @@ class KeyboardCanvas(QWidget):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Keyboard Visualizer")
+        self.setWindowTitle("KeyViz")
         self.setStyleSheet(
             """
             QMainWindow {
@@ -695,7 +695,9 @@ class MainWindow(QMainWindow):
             for widget in editor_widgets:
                 widget.setEnabled(False)
             # Start monitoring with current key scan codes
-            scan_codes = [key.scan_code for key in self.canvas.keys if key.scan_code is not None]
+            scan_codes = [
+                key.scan_code for key in self.canvas.keys if key.scan_code is not None
+            ]
             if scan_codes:  # Only start monitoring if we have keys to monitor
                 self.keyboard_manager.start_monitoring(scan_codes)
                 self.state_check_timer.start()
@@ -722,7 +724,11 @@ class MainWindow(QMainWindow):
         if not self.canvas.editor_mode:  # Only check states in visualizer mode
             try:
                 key_states = self.keyboard_manager.get_key_states()
-                key_map = {key.scan_code: key for key in self.canvas.keys if key.scan_code is not None}
+                key_map = {
+                    key.scan_code: key
+                    for key in self.canvas.keys
+                    if key.scan_code is not None
+                }
 
                 for scan_code, is_pressed in key_states.items():
                     try:

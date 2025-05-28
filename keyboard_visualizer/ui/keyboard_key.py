@@ -35,7 +35,7 @@ class KeyboardKey(QWidget):
         parent = self.parent()
         if parent is None:
             return
-            
+
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
@@ -172,7 +172,7 @@ class KeyboardKey(QWidget):
         parent = self.parent()
         if parent is None:
             return
-            
+
         if parent.editor_mode:
             if event.button() == Qt.MouseButton.LeftButton:
                 handle = self.getResizeHandle(event.pos())
@@ -203,7 +203,7 @@ class KeyboardKey(QWidget):
         parent = self.parent()
         if parent is None:
             return
-            
+
         if event.button() == Qt.MouseButton.LeftButton:
             self.dragging = False
             self.resizing = False
@@ -214,7 +214,7 @@ class KeyboardKey(QWidget):
         parent = self.parent()
         if parent is None:
             return
-            
+
         if parent.editor_mode:
             if self.resizing:
                 # Handle resizing
@@ -272,7 +272,7 @@ class KeyboardKey(QWidget):
         parent = self.parent()
         if parent is None:
             return
-            
+
         if parent.editor_mode:
             # Get new label
             new_label, ok = QInputDialog.getText(
