@@ -8,7 +8,7 @@ A PyQt6-based application for visualizing keyboard input in real-time. Features 
 ![QWERTY](./img/regular_qwerty.png)
 
 ### Dactyl-Manuform Layout
-![Dactyl-Manuform](./img/regular_qwerty.png)
+![Dactyl-Manuform](./img/Dactyl-Manuform-(5x6+2)_1.png)
 
 
 ## Features
