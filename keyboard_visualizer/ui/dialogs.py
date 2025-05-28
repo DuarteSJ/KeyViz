@@ -58,7 +58,7 @@ class KeyBindDialog(QDialog):
         self.label = QLabel("Press the key you want to bind...")
         self.layout.addWidget(self.label)
 
-        self.key_name = None
+        self.key_info = None
         self.setLayout(self.layout)
 
         # Start key detection
@@ -67,8 +67,8 @@ class KeyBindDialog(QDialog):
         self.timer.start(100)
 
     def check_key(self):
-        key = self.keyboard_manager.wait_for_key()
-        if key:
-            self.key_name = key
+        key_info = self.keyboard_manager.wait_for_key()
+        if key_info:
+            self.key_info = key_info  # This now contains both name and scan_code
             self.timer.stop()
             self.accept()

@@ -26,33 +26,35 @@ class KeyboardHelper:
 
         # Store current key states
         self.key_states = {}
+        self.last_error_time = 0  # Track last error time to reduce spam
 
     def wait_for_key(self):
-        """Wait for a single keypress and return its name."""
-        key_pressed = None
+        """Wait for a single keypress and return its scan code and name."""
+        key_info = None
 
         def on_key(event):
-            nonlocal key_pressed
+            nonlocal key_info
             if event.event_type == keyboard.KEY_DOWN:
-                key_pressed = event.name
+                key_info = {
+                    'scan_code': event.scan_code,
+                    'name': event.name,
+                }
                 keyboard.unhook_all()
 
         keyboard.hook(on_key)
-        while not key_pressed:
+        while not key_info:
             time.sleep(0.1)
-        return key_pressed
+        return key_info
 
-    def start_monitoring(self, config):
-        """Start monitoring keys based on configuration."""
+    def start_monitoring(self, scan_codes):
+        """Start monitoring keys based on scan codes."""
         keyboard.unhook_all()
         self.key_states = {}  # Reset states
 
         def on_key_event(e):
-            print(f"Key {e.name} {e.event_type}")
-            if e.name.lower() in config:
-                self.key_states[e.name.lower()] = e.event_type == keyboard.KEY_DOWN
-                state = "pressed" if e.event_type == keyboard.KEY_DOWN else "released"
-                print(f"Key {e.name} {state}")
+            print(f"Key: {e.name}, Scan code: {e.scan_code}")
+            if e.scan_code in scan_codes:
+                self.key_states[e.scan_code] = e.event_type == keyboard.KEY_DOWN
                 try:
                     with open(self.response_file, "w") as f:
                         json.dump(self.key_states, f)
@@ -73,12 +75,12 @@ class KeyboardHelper:
 
                     # Handle different command types
                     if command["type"] == "wait_key":
-                        key = self.wait_for_key()
+                        key_info = self.wait_for_key()
                         with open(self.response_file, "w") as f:
-                            json.dump({"key": key}, f)
+                            json.dump({"key_info": key_info}, f)
 
                     elif command["type"] == "monitor":
-                        self.start_monitoring(command["keys"])
+                        self.start_monitoring(command["scan_codes"])
 
                     elif command["type"] == "stop_monitor":
                         keyboard.unhook_all()
@@ -89,11 +91,20 @@ class KeyboardHelper:
                     # Remove the command file after processing
                     self.command_file.unlink()
 
+            except FileNotFoundError:
+                # Command file doesn't exist yet, just wait
+                time.sleep(0.1)
+            except json.JSONDecodeError:
+                # File might be partially written, wait and retry
+                time.sleep(0.1)
             except Exception as e:
-                # print(f"Error in helper: {e}")
-                ...
+                # Only print error if enough time has passed since last error
+                current_time = time.time()
+                if current_time - self.last_error_time >= 5:  # Only print every 5 seconds
+                    print(f"Error in helper: {e}")
+                    self.last_error_time = current_time
 
-            time.sleep(0.1)
+            time.sleep(0.1)  # Add a small delay to prevent busy waiting
 
         # Cleanup on exit
         keyboard.unhook_all()
@@ -105,3 +116,4 @@ class KeyboardHelper:
 if __name__ == "__main__":
     helper = KeyboardHelper()
     helper.run()
+ 

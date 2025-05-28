@@ -5,11 +5,11 @@ from .dialogs import KeyBindDialog
 
 
 class KeyboardKey(QWidget):
-    def __init__(self, label="", key_bind="", keyboard_manager=None, parent=None):
+    def __init__(self, label="", key_bind="", scan_code=None, parent=None):
         super().__init__(parent)
         self.label = label
-        self.key_bind = key_bind
-        self.keyboard_manager = keyboard_manager
+        self.key_bind = key_bind  # Keep for backward compatibility
+        self.scan_code = scan_code
         self.pressed = False
         self.selected = False
         self.setFixedSize(40, 40)
@@ -32,6 +32,10 @@ class KeyboardKey(QWidget):
         self.setMouseTracking(True)
 
     def paintEvent(self, event):
+        parent = self.parent()
+        if parent is None:
+            return
+            
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
@@ -122,7 +126,7 @@ class KeyboardKey(QWidget):
         painter.drawText(int(x), int(y), self.label)
 
         # Draw resize handles when selected
-        if self.selected and self.parent().editor_mode:
+        if self.selected and parent.editor_mode:
             handle_size = 6
             handle_color = QColor("#88C0D0")
             painter.fillRect(0, 0, handle_size, handle_size, handle_color)
@@ -165,7 +169,11 @@ class KeyboardKey(QWidget):
         return None
 
     def mousePressEvent(self, event):
-        if self.parent().editor_mode:
+        parent = self.parent()
+        if parent is None:
+            return
+            
+        if parent.editor_mode:
             if event.button() == Qt.MouseButton.LeftButton:
                 handle = self.getResizeHandle(event.pos())
                 if handle and self.selected:
@@ -182,24 +190,32 @@ class KeyboardKey(QWidget):
                     else:
                         # If not Ctrl+Click, start dragging and handle selection
                         if not self.selected:
-                            self.parent().clearSelection()
+                            parent.clearSelection()
                             self.selected = True
                             self.update()
                         self.dragging = True
                         self.offset = event.pos()
-                        self.parent().startDrag(event.pos())
+                        parent.startDrag(event.pos())
             elif event.button() == Qt.MouseButton.RightButton:
-                self.parent().removeKey(self)
+                parent.removeKey(self)
 
     def mouseReleaseEvent(self, event):
+        parent = self.parent()
+        if parent is None:
+            return
+            
         if event.button() == Qt.MouseButton.LeftButton:
             self.dragging = False
             self.resizing = False
             self.resize_handle = None
-            self.parent().endDrag()
+            parent.endDrag()
 
     def mouseMoveEvent(self, event):
-        if self.parent().editor_mode:
+        parent = self.parent()
+        if parent is None:
+            return
+            
+        if parent.editor_mode:
             if self.resizing:
                 # Handle resizing
                 delta = event.pos() - self.offset
@@ -232,14 +248,14 @@ class KeyboardKey(QWidget):
 
             elif self.dragging:
                 new_pos = self.mapToParent(event.pos() - self.offset)
-                if len(self.parent().drag_keys) > 1:
-                    self.parent().updateDragPosition(event.pos(), self)
+                if len(parent.drag_keys) > 1:
+                    parent.updateDragPosition(event.pos(), self)
                 else:
                     new_pos.setX(
-                        max(0, min(new_pos.x(), self.parent().width() - self.width()))
+                        max(0, min(new_pos.x(), parent.width() - self.width()))
                     )
                     new_pos.setY(
-                        max(0, min(new_pos.y(), self.parent().height() - self.height()))
+                        max(0, min(new_pos.y(), parent.height() - self.height()))
                     )
                     self.move(new_pos)
             else:
@@ -253,7 +269,11 @@ class KeyboardKey(QWidget):
                     self.setCursor(Qt.CursorShape.ArrowCursor)
 
     def mouseDoubleClickEvent(self, event):
-        if self.parent().editor_mode:
+        parent = self.parent()
+        if parent is None:
+            return
+            
+        if parent.editor_mode:
             # Get new label
             new_label, ok = QInputDialog.getText(
                 self, "Edit Key Label", "Enter display label:", text=self.label
@@ -261,7 +281,8 @@ class KeyboardKey(QWidget):
             if ok:
                 self.label = new_label
                 # Get key binding
-                dialog = KeyBindDialog(self.keyboard_manager, self)
-                if dialog.exec() == QDialog.DialogCode.Accepted and dialog.key_name:
-                    self.key_bind = dialog.key_name
+                dialog = KeyBindDialog(parent.keyboard_manager, self)
+                if dialog.exec() == QDialog.DialogCode.Accepted and dialog.key_info:
+                    self.key_bind = dialog.key_info["name"]
+                    self.scan_code = dialog.key_info["scan_code"]
                 self.update()

@@ -109,10 +109,10 @@ class MainWindow(QMainWindow):
             self.toggle_mode_btn.setText("Stop Visualizer")
             for widget in editor_widgets:
                 widget.setEnabled(False)
-            # Start monitoring with current key bindings
-            key_binds = [key.key_bind.lower() for key in self.canvas.keys]
-            if key_binds:  # Only start monitoring if we have keys to monitor
-                self.keyboard_manager.start_monitoring(key_binds)
+            # Start monitoring with current key scan codes
+            scan_codes = [key.scan_code for key in self.canvas.keys if key.scan_code is not None]
+            if scan_codes:  # Only start monitoring if we have keys to monitor
+                self.keyboard_manager.start_monitoring(scan_codes)
                 self.state_check_timer.start()
             self.canvas.setCursor(Qt.CursorShape.ArrowCursor)
 
@@ -135,15 +135,27 @@ class MainWindow(QMainWindow):
 
     def check_keyboard_state(self):
         if not self.canvas.editor_mode:  # Only check states in visualizer mode
-            key_states = self.keyboard_manager.get_key_states()
-            key_map = {key.key_bind.lower(): key for key in self.canvas.keys}
+            try:
+                key_states = self.keyboard_manager.get_key_states()
+                key_map = {key.scan_code: key for key in self.canvas.keys if key.scan_code is not None}
 
-            for key_name, is_pressed in key_states.items():
-                if key_name in key_map:
-                    key_map[key_name].pressed = is_pressed
-                    key_map[key_name].update()
+                for scan_code, is_pressed in key_states.items():
+                    try:
+                        # Try to convert scan_code to int if it's a string
+                        if isinstance(scan_code, str):
+                            scan_code = int(scan_code)
+                        if scan_code in key_map:
+                            key_map[scan_code].pressed = is_pressed
+                            key_map[scan_code].update()
+                    except (ValueError, TypeError):
+                        # Skip invalid scan codes
+                        continue
+
+            except Exception as e:
+                print(f"Error checking keyboard state: {e}")
 
     def closeEvent(self, event):
         self.state_check_timer.stop()
         self.keyboard_manager.stop()
         event.accept()
+ 

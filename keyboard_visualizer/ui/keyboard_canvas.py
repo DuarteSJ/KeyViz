@@ -11,13 +11,7 @@ class KeyboardCanvas(QWidget):
         self.keys = []
         self.editor_mode = True
         self.setMinimumSize(800, 400)
-        self.setStyleSheet(
-            """
-            QWidget {
-                background-color: #1D2128;  /* Darker background for contrast */
-            }
-        """
-        )
+        self.updateBackground()
         self.setCursor(Qt.CursorShape.CrossCursor)
 
         # For drag functionality
@@ -25,6 +19,14 @@ class KeyboardCanvas(QWidget):
         self.drag_start = None
         self.drag_keys = []
         self.key_initial_positions = {}
+
+    def updateBackground(self):
+        """Update the background color based on the editor mode."""
+        if self.editor_mode:
+            self.setStyleSheet("QWidget { background-color: #2E3440; }")
+        else:
+            # Transparent background for visualizer mode
+            self.setStyleSheet("QWidget { background-color: transparent; }")
 
     def mousePressEvent(self, event):
         if self.editor_mode and event.button() == Qt.MouseButton.LeftButton:
@@ -34,14 +36,19 @@ class KeyboardCanvas(QWidget):
 
             # Create new key at click position
             dialog = KeyBindDialog(self.keyboard_manager, self)
-            if dialog.exec() == QDialog.DialogCode.Accepted and dialog.key_name:
+            if dialog.exec() == QDialog.DialogCode.Accepted and dialog.key_info:
                 key = KeyboardKey(
-                    dialog.key_name, dialog.key_name, self.keyboard_manager, self
+                    dialog.key_info["name"],
+                    dialog.key_info["name"],
+                    None,  # Don't pass keyboard_manager to key
+                    self
                 )
+                key.scan_code = dialog.key_info["scan_code"]
                 pos = event.pos()
                 pos.setX(pos.x() - key.width() // 2)
                 pos.setY(pos.y() - key.height() // 2)
                 key.move(pos)
+                key.setParent(self)  # Ensure parent is set
                 self.keys.append(key)
                 key.show()
 
@@ -83,10 +90,12 @@ class KeyboardCanvas(QWidget):
     def removeKey(self, key):
         if key in self.keys:
             self.keys.remove(key)
+            key.setParent(None)  # Clear parent before deletion
             key.deleteLater()
 
     def clearKeys(self):
         for key in self.keys:
+            key.setParent(None)  # Clear parent before deletion
             key.deleteLater()
         self.keys.clear()
 
@@ -96,6 +105,7 @@ class KeyboardCanvas(QWidget):
                 {
                     "label": key.label,
                     "key_bind": key.key_bind,
+                    "scan_code": key.scan_code,
                     "x": key.x(),
                     "y": key.y(),
                     "width": key.width(),
@@ -111,10 +121,11 @@ class KeyboardCanvas(QWidget):
             key = KeyboardKey(
                 key_data["label"],
                 key_data.get("key_bind", ""),
-                self.keyboard_manager,
-                self,
+                key_data.get("scan_code"),  # Pass scan_code directly
+                self  # Pass parent
             )
             key.setFixedSize(key_data["width"], key_data["height"])
             key.move(key_data["x"], key_data["y"])
+            key.setParent(self)  # Ensure parent is set
             self.keys.append(key)
             key.show()
