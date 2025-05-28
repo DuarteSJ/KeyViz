@@ -1,2 +1,12 @@
 PyQt6>=6.4.0
-keyboard==0.13.5 
+keyboard==0.13.5 black==25.1.0
+click==8.2.1
+evdev==1.9.2
+keyboard==0.13.5
+mypy_extensions==1.1.0
+packaging==25.0
+pathspec==0.12.1
+platformdirs==4.3.8
+PyQt6==6.9.0
+PyQt6-Qt6==6.9.0
+PyQt6_sip==13.10.2
