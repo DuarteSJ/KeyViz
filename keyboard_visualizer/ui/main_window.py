@@ -156,6 +156,8 @@ class MainWindow(QMainWindow):
                         if isinstance(scan_code, str):
                             scan_code = int(scan_code)
                         if scan_code in key_map:
+                            if key_map[scan_code].pressed == False and is_pressed:
+                                key_map[scan_code].playSound()
                             key_map[scan_code].pressed = is_pressed
                             key_map[scan_code].update()
                     except (ValueError, TypeError):

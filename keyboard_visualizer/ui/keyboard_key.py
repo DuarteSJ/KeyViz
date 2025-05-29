@@ -1,8 +1,11 @@
 from PyQt6.QtWidgets import QWidget, QInputDialog, QDialog
 from PyQt6.QtCore import Qt, QPoint, QRect
 from PyQt6.QtGui import QPainter, QColor, QPen, QPainterPath, QRadialGradient
+from PyQt6.QtMultimedia import QSoundEffect
+from PyQt6.QtCore import QUrl
 from pathlib import Path
 import json
+import random
 
 from .dialogs import KeyBindDialog
 from ..utils.config import load_key_colors
@@ -26,6 +29,23 @@ class KeyboardKey(QWidget):
         self.min_size = 30
 
         self.setMouseTracking(True)
+        self.sound_effect = self.setSoundEffect(key_bind)
+
+
+
+    def setSoundEffect(self, key_bind):
+        sound_path = Path(__file__).parent.parent.parent / "sounds" / f"{key_bind}.wav"
+        if not sound_path.exists():
+            # choose random letter of the alphabet to replace the sound
+            choice = random.choice("abcdefghijklmnopqrstuvwxyz")
+            sound_path = Path(__file__).parent.parent.parent / "sounds" / f"{choice}.wav"
+            if not sound_path.exists():
+                # default to the sound of a if the chosen sound also does not exist
+                sound_path = Path(__file__).parent.parent.parent / "sounds" / "a.wav"
+        self.sound_effect = QSoundEffect()
+        self.sound_effect.setSource(QUrl.fromLocalFile(str(sound_path)))
+        self.sound_effect.setVolume(0.3)
+        return self.sound_effect
 
     def paintEvent(self, event):
         parent = self.parent()
@@ -230,3 +250,10 @@ class KeyboardKey(QWidget):
                     self.key_bind = dialog.key_info["name"]
                     self.scan_code = dialog.key_info["scan_code"]
                 self.update()
+
+    def playSound(self):
+        """Play a sound when the key is pressed."""
+        if self.sound_effect.isLoaded():
+            self.sound_effect.play()
+        else:
+            print("Sound not loaded.")
