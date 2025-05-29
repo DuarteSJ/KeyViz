@@ -1,5 +1,6 @@
 import sys
 import json
+from pathlib import Path
 from PyQt6.QtWidgets import (
     QMainWindow,
     QWidget,
@@ -10,39 +11,43 @@ from PyQt6.QtWidgets import (
     QFileDialog,
 )
 from PyQt6.QtCore import QTimer, Qt
+
 from .keyboard_canvas import KeyboardCanvas
 from ..core.keyboard_manager import KeyboardManager
+from ..utils.config import load_main_window_colors
 
+
+MAIN_WINDOW_COLORS = load_main_window_colors()
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("KeyViz")
         self.setStyleSheet(
-            """
-            QMainWindow {
-                background-color: #2E3440;
-            }
-            QPushButton {
-                background-color: #3B4252;
-                color: #ECEFF4;
-                border: 1px solid #4C566A;
+            f"""
+            QMainWindow {{
+                background-color: {MAIN_WINDOW_COLORS['main_background']};
+            }}
+            QPushButton {{
+                background-color: {MAIN_WINDOW_COLORS['button_normal']};
+                color: {MAIN_WINDOW_COLORS['button_text']};
+                border: 1px solid {MAIN_WINDOW_COLORS['button_border']};
                 border-radius: 4px;
                 padding: 6px 12px;
                 min-width: 80px;
-            }
-            QPushButton:hover {
-                background-color: #434C5E;
-            }
-            QPushButton:pressed {
-                background-color: #4C566A;
-            }
-            QPushButton:disabled {
-                background-color: #2E3440;
-                color: #4C566A;
-            }
-        """
-        )
+            }}
+            QPushButton:hover {{
+                background-color: {MAIN_WINDOW_COLORS['button_hover']};
+            }}
+            QPushButton:pressed {{
+                background-color: {MAIN_WINDOW_COLORS['button_pressed']};
+            }}
+            QPushButton:disabled {{
+                background-color: {MAIN_WINDOW_COLORS['button_disabled_bg']};
+                color: {MAIN_WINDOW_COLORS['button_disabled_text']};
+            }}
+            """
+            )
 
         # Initialize keyboard manager
         self.keyboard_manager = KeyboardManager()

@@ -1,0 +1,39 @@
+{
+  "key_colors": {
+    "pressed": "#88C0D0",
+    "selected": "#4C677B",
+    "normal": "#434C5E",
+    "glow_center": "#88C0D0",
+    "glow_edge": "#4C566A",
+    "highlight_selected": "#5E81AC",
+    "highlight_normal": "#5E6B81",
+    "text_normal": "#ECEFF4",
+    "text_pressed": "#2E3440",
+    "text_shadow": "#2E3440",
+    "resize_handle": "#88C0D0"
+  },
+  "main_window_colors": {
+    "main_background": "#2E3440",
+    "button_normal": "#434C5E",
+    "button_text": "#ECEFF4",
+    "button_border": "#4C566A",
+    "button_hover": "#5E81AC",
+    "button_pressed": "#88C0D0",
+    "button_disabled_bg": "#3B4252",
+    "button_disabled_text": "#4C566A"
+  },
+  "dialog_colors": {
+    "main_background": "#2E3440",
+    "button_normal": "#434C5E",
+    "button_text": "#ECEFF4",
+    "button_border": "#4C566A",
+    "button_hover": "#5E81AC",
+    "button_pressed": "#88C0D0",
+    "button_disabled_bg": "#3B4252",
+    "button_disabled_text": "#4C566A",
+    "dialog_background": "#2E3440",
+    "text_color": "#ECEFF4",
+    "input_background": "#434C5E",
+    "input_border": "#4C566A"
+  }
+}

@@ -1,8 +1,13 @@
 from PyQt6.QtWidgets import QWidget, QInputDialog, QDialog
 from PyQt6.QtCore import Qt, QPoint, QRect
 from PyQt6.QtGui import QPainter, QColor, QPen, QPainterPath, QRadialGradient
-from .dialogs import KeyBindDialog
+from pathlib import Path
+import json
 
+from .dialogs import KeyBindDialog
+from ..utils.config import load_key_colors
+
+KEY_COLORS = load_key_colors()
 
 class KeyboardKey(QWidget):
     def __init__(self, label="", key_bind="", scan_code=None, parent=None):
@@ -30,55 +35,48 @@ class KeyboardKey(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-        path = QPainterPath()
-        path.addRoundedRect(1, 1, self.width() - 2, self.height() - 2, 5, 5)
-
         if self.pressed:
-            top_color = QColor("#88C0D0")
-            side_color = QColor("#5E81AC")
-            bottom_color = QColor("#4C566A")
-            glow = QRadialGradient(self.width() / 2, self.height() / 2, self.width() / 2)
-            glow.setColorAt(0, QColor("#88C0D0"))
-            glow.setColorAt(1, QColor("#88C0D000"))
+            color = QColor(KEY_COLORS["pressed"])
+            glow = QRadialGradient(
+                self.width() / 2, self.height() / 2, self.width() / 2
+            )
+            glow.setColorAt(0, QColor(KEY_COLORS["glow_center"]))
+            glow.setColorAt(1, QColor(KEY_COLORS["glow_edge"]))
             painter.fillRect(0, 0, self.width(), self.height(), glow)
         else:
-            top_color = QColor("#4C566A") if self.selected else QColor("#434C5E")
-            side_color = QColor("#3B4252")
-            bottom_color = QColor("#2E3440")
-
-        if not self.pressed:
-            side_path = QPainterPath()
-            side_path.moveTo(self.width() - 2, 2)
-            side_path.lineTo(self.width() - 2, self.height() - 2)
-            side_path.lineTo(self.width() - 4, self.height() - 4)
-            side_path.lineTo(self.width() - 4, 4)
-            side_path.closeSubpath()
-            painter.fillPath(side_path, side_color)
-
-            bottom_path = QPainterPath()
-            bottom_path.moveTo(2, self.height() - 2)
-            bottom_path.lineTo(self.width() - 2, self.height() - 2)
-            bottom_path.lineTo(self.width() - 4, self.height() - 4)
-            bottom_path.lineTo(4, self.height() - 4)
-            bottom_path.closeSubpath()
-            painter.fillPath(bottom_path, bottom_color)
+            color = (
+                QColor(KEY_COLORS["selected"])
+                if self.selected
+                else QColor(KEY_COLORS["normal"])
+            )
 
         main_face = QPainterPath()
-        if self.pressed:
-            main_face.addRoundedRect(3, 3, self.width() - 4, self.height() - 4, 5, 5)
-        else:
-            main_face.addRoundedRect(1, 1, self.width() - 2, self.height() - 2, 5, 5)
-        painter.fillPath(main_face, top_color)
+        main_face.addRoundedRect(1, 1, self.width() - 2, self.height() - 2, 5, 5)
+        painter.fillPath(main_face, color)
 
         if not self.pressed:
             highlight_path = QPainterPath()
             highlight_path.moveTo(2, 2)
             highlight_path.lineTo(self.width() - 2, 2)
-            pen = QPen(QColor("#5E81AC" if self.selected else "#5E6B81"))
+            pen = QPen(
+                QColor(
+                    KEY_COLORS["highlight_selected"]
+                    if self.selected
+                    else KEY_COLORS["highlight_normal"]
+                )
+            )
             pen.setWidth(1)
             painter.strokePath(highlight_path, pen)
 
-        painter.setPen(QPen(QColor("#ECEFF4" if not self.pressed else "#2E3440")))
+        painter.setPen(
+            QPen(
+                QColor(
+                    KEY_COLORS["text_normal"]
+                    if not self.pressed
+                    else KEY_COLORS["text_pressed"]
+                )
+            )
+        )
         font = painter.font()
         font.setPointSize(9)
         font.setFamily("Arial")
@@ -94,28 +92,47 @@ class KeyboardKey(QWidget):
             y += 2
 
         if not self.pressed:
-            painter.setPen(QPen(QColor("#2E3440")))
+            painter.setPen(QPen(QColor(KEY_COLORS["text_shadow"])))
             painter.drawText(int(x + 1), int(y + 1), self.label)
-            painter.setPen(QPen(QColor("#ECEFF4")))
+            painter.setPen(QPen(QColor(KEY_COLORS["text_normal"])))
         painter.drawText(int(x), int(y), self.label)
 
         if self.selected and parent.editor_mode:
             handle_size = 6
-            handle_color = QColor("#88C0D0")
-            painter.fillRect(0, 0, handle_size, handle_color)
-            painter.fillRect(self.width() - handle_size, 0, handle_size, handle_color)
-            painter.fillRect(0, self.height() - handle_size, handle_size, handle_color)
-            painter.fillRect(self.width() - handle_size, self.height() - handle_size, handle_size, handle_color)
+            handle_color = QColor(KEY_COLORS["resize_handle"])
+            painter.fillRect(0, 0, handle_size, handle_size, handle_color)
+            painter.fillRect(
+                self.width() - handle_size, 0, handle_size, handle_size, handle_color
+            )
+            painter.fillRect(
+                0, self.height() - handle_size, handle_size, handle_size, handle_color
+            )
+            painter.fillRect(
+                self.width() - handle_size,
+                self.height() - handle_size,
+                handle_size,
+                handle_size,
+                handle_color,
+            )
 
     def getResizeHandle(self, pos):
         handle_size = 6
         if QRect(0, 0, handle_size, handle_size).contains(pos):
             return "top-left"
-        elif QRect(self.width() - handle_size, 0, handle_size, handle_size).contains(pos):
+        elif QRect(self.width() - handle_size, 0, handle_size, handle_size).contains(
+            pos
+        ):
             return "top-right"
-        elif QRect(0, self.height() - handle_size, handle_size, handle_size).contains(pos):
+        elif QRect(0, self.height() - handle_size, handle_size, handle_size).contains(
+            pos
+        ):
             return "bottom-left"
-        elif QRect(self.width() - handle_size, self.height() - handle_size, handle_size, handle_size).contains(pos):
+        elif QRect(
+            self.width() - handle_size,
+            self.height() - handle_size,
+            handle_size,
+            handle_size,
+        ).contains(pos):
             return "bottom-right"
         return None
 
@@ -203,7 +220,9 @@ class KeyboardKey(QWidget):
     def mouseDoubleClickEvent(self, event):
         parent = self.parent()
         if parent and parent.editor_mode:
-            new_label, ok = QInputDialog.getText(self, "Edit Key Label", "Enter display label:", text=self.label)
+            new_label, ok = QInputDialog.getText(
+                self, "Edit Key Label", "Enter display label:", text=self.label
+            )
             if ok:
                 self.label = new_label
                 dialog = KeyBindDialog(parent.keyboard_manager, self)

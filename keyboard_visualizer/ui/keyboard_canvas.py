@@ -11,7 +11,6 @@ class KeyboardCanvas(QWidget):
         self.keys = []
         self.editor_mode = True
         self.setMinimumSize(800, 400)
-        self.updateBackground()
         self.setCursor(Qt.CursorShape.CrossCursor)
 
         # For drag functionality
@@ -19,14 +18,6 @@ class KeyboardCanvas(QWidget):
         self.drag_start = None
         self.drag_keys = []
         self.key_initial_positions = {}
-
-    def updateBackground(self):
-        """Update the background color based on the editor mode."""
-        if self.editor_mode:
-            self.setStyleSheet("QWidget { background-color: #2E3440; }")
-        else:
-            # Transparent background for visualizer mode
-            self.setStyleSheet("QWidget { background-color: transparent; }")
 
     def mousePressEvent(self, event):
         if self.editor_mode and event.button() == Qt.MouseButton.LeftButton:
