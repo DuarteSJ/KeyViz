@@ -19,6 +19,61 @@ class KeyboardCanvas(QWidget):
         self.drag_keys = []
         self.key_initial_positions = {}
 
+        # For scaling functionality
+        self.base_size = None
+        self.key_original_sizes = {}
+        self.key_original_positions = {}
+
+    def saveOriginalLayout(self):
+        """Save the original layout dimensions for scaling."""
+        if not self.base_size:
+            self.base_size = self.size()
+            self.key_original_sizes = {key: key.size() for key in self.keys}
+            self.key_original_positions = {key: key.pos() for key in self.keys}
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        
+        if not self.editor_mode and self.keys:
+            if not self.base_size:
+                self.saveOriginalLayout()
+            
+            # Calculate scale factors
+            width_scale = event.size().width() / self.base_size.width()
+            height_scale = event.size().height() / self.base_size.height()
+            
+            # Use the smaller scale to maintain aspect ratio
+            scale = min(width_scale, height_scale)
+            
+            for key in self.keys:
+                # Scale size
+                original_size = self.key_original_sizes[key]
+                new_width = int(original_size.width() * scale)
+                new_height = int(original_size.height() * scale)
+                key.setFixedSize(new_width, new_height)
+                
+                # Scale position
+                original_pos = self.key_original_positions[key]
+                new_x = int(original_pos.x() * scale)
+                new_y = int(original_pos.y() * scale)
+                key.move(new_x, new_y)
+
+    def toggleEditorMode(self, enabled):
+        """Toggle between editor and visualization modes."""
+        self.editor_mode = enabled
+        if enabled:
+            # Reset to original sizes and positions when entering editor mode
+            if self.base_size:
+                for key in self.keys:
+                    key.setFixedSize(self.key_original_sizes[key])
+                    key.move(self.key_original_positions[key])
+                self.base_size = None
+                self.key_original_sizes.clear()
+                self.key_original_positions.clear()
+        else:
+            # Save original layout when entering visualization mode
+            self.saveOriginalLayout()
+
     def mousePressEvent(self, event):
         if self.editor_mode and event.button() == Qt.MouseButton.LeftButton:
             if not (event.modifiers() & Qt.KeyboardModifier.ControlModifier):

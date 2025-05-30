@@ -124,11 +124,11 @@ class MainWindow(QMainWindow):
         self.state_check_timer.setInterval(16)  # ~60 FPS
 
     def toggleMode(self):
-        self.canvas.editor_mode = not self.canvas.editor_mode
+        self.canvas.toggleEditorMode(not self.canvas.editor_mode)
         editor_widgets = [self.save_btn, self.load_btn]
 
         if self.canvas.editor_mode:
-            self.toggle_mode_btn.setText("")
+            self.toggle_mode_btn.setText(" ")
             self.toggle_mode_btn.setToolTip("Start Visualizer")
             for widget in editor_widgets:
                 widget.setEnabled(True)

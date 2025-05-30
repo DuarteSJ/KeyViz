@@ -98,7 +98,11 @@ class KeyboardKey(QWidget):
             )
         )
         font = painter.font()
-        font.setPointSize(9)
+        # Scale font size based on key size
+        base_size = 40  # Original key size
+        scale_factor = min(self.width() / base_size, self.height() / base_size)
+        font_size = max(6, int(9 * scale_factor))  # Minimum font size of 6
+        font.setPointSize(font_size)
         font.setFamily("Arial")
         font.setBold(True)
         painter.setFont(font)
@@ -118,7 +122,7 @@ class KeyboardKey(QWidget):
         painter.drawText(int(x), int(y), self.label)
 
         if self.selected and parent.editor_mode:
-            handle_size = 6
+            handle_size = min(6, int(self.width() * 0.15))  # Scale handle size with key size
             handle_color = QColor(KEY_COLORS["resize_handle"])
             painter.fillRect(0, 0, handle_size, handle_size, handle_color)
             painter.fillRect(
