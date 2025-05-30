@@ -1,0 +1,29 @@
+{
+  "keys": [
+    {"label": "` ~", "key_bind": "`", "scan_code": 41, "x": 8, "y": 10, "width": 20, "height": 20},
+    {"label": "[ {", "key_bind": "[", "scan_code": 26, "x": 33, "y": 10, "width": 20, "height": 20},
+    {"label": "!", "key_bind": "1", "scan_code": 2, "x": 59, "y": 2, "width": 20, "height": 20},
+    {"label": "@", "key_bind": "2", "scan_code": 3, "x": 84, "y": 3, "width": 20, "height": 20},
+    {"label": "#", "key_bind": "3", "scan_code": 4, "x": 109, "y": 3, "width": 20, "height": 20},
+    {"label": "$", "key_bind": "4", "scan_code": 5, "x": 134, "y": 4, "width": 20, "height": 20},
+    {"label": "%", "key_bind": "5", "scan_code": 6, "x": 245, "y": 4, "width": 20, "height": 20},
+    {"label": "^", "key_bind": "6", "scan_code": 7, "x": 271, "y": 3, "width": 20, "height": 20},
+    {"label": "&", "key_bind": "7", "scan_code": 8, "x": 296, "y": 3, "width": 20, "height": 20},
+    {"label": "*", "key_bind": "8", "scan_code": 9, "x": 321, "y": 2, "width": 20, "height": 20},
+    {"label": "] }", "key_bind": "]", "scan_code": 27, "x": 346, "y": 10, "width": 20, "height": 20},
+    {"label": "Mute", "key_bind": "windows", "scan_code": 91, "x": 371, "y": 10, "width": 20, "height": 20},
+    {"label": "Esc", "key_bind": "esc", "scan_code": 1, "x": 8, "y": 35, "width": 20, "height": 20},
+    {"label": "Q", "key_bind": "q", "scan_code": 16, "x": 33, "y": 35, "width": 20, "height": 20},
+    {"label": "W", "key_bind": "w", "scan_code": 17, "x": 59, "y": 26, "width": 20, "height": 20},
+    {"label": "E", "key_bind": "e", "scan_code": 18, "x": 84, "y": 28, "width": 20, "height": 20},
+    {"label": "R", "key_bind": "r", "scan_code": 19, "x": 109, "y": 29, "width": 20, "height": 20},
+    {"label": "T", "key_bind": "t", "scan_code": 20, "x": 135, "y": 30, "width": 20, "height": 20},
+    {"label": "Y", "key_bind": "y", "scan_code": 21, "x": 246, "y": 30, "width": 20, "height": 20},
+    {"label": "U", "key_bind": "u", "scan_code": 22, "x": 271, "y": 29, "width": 20, "height": 20},
+    {"label": "I", "key_bind": "i", "scan_code": 23, "x": 296, "y": 28, "width": 20, "height": 20},
+    {"label": "O", "key_bind": "o", "scan_code": 24, "x": 321, "y": 26, "width": 20, "height": 20},
+    {"label": "P", "key_bind": "p", "scan_code": 25, "x": 347, "y": 35, "width": 20, "height": 20},
+    {"label": "Mac1", "key_bind": "windows", "scan_code": 91, "x": 371, "y": 35, "width": 20, "height": 20}
+    // Add more keys here in the same scaled-down fashion...
+  ]
+}

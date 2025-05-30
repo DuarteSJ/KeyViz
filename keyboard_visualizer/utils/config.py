@@ -59,12 +59,12 @@ def load_key_colors() -> Dict[str, str]:
     print(f"Loaded key colors: {colors}\n")
     return colors
 
-def load_main_window_colors() -> Dict[str, str]:
+def load_main_window_settings() -> Dict[str, str]:
     """Load main window colors from configuration."""
     config = load_config()
-    colors = config.get("main_window_colors", {})
-    print(f"Loaded UI colors: {colors}\n")
-    return colors
+    settings = config.get("main_window", {})
+    print(f"Loaded main window settings colors: {settings}\n")
+    return settings
 
 def load_dialog_colors() -> Dict[str, str]:
     """Load dialog colors from configuration."""

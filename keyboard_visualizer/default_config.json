@@ -12,7 +12,7 @@
     "text_shadow": "#2E3440",
     "resize_handle": "#88C0D0"
   },
-  "main_window_colors": {
+  "main_window": {
     "main_background": "#2E3440",
     "button_normal": "#434C5E",
     "button_text": "#ECEFF4",

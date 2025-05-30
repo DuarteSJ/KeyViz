@@ -14,37 +14,45 @@ from PyQt6.QtCore import QTimer, Qt
 
 from .keyboard_canvas import KeyboardCanvas
 from ..core.keyboard_manager import KeyboardManager
-from ..utils.config import load_main_window_colors
+from ..utils.config import load_main_window_settings
 
 
-MAIN_WINDOW_COLORS = load_main_window_colors()
+MAIN_WINDOW_SETTINGS = load_main_window_settings()
+# print all keys int the loaded json
+print(f"Loaded main window settings: {MAIN_WINDOW_SETTINGS}\n")
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.interface_minimized = False
+        self.hideable_buttons = []
         self.setWindowTitle("KeyViz")
+        self.setMinimumSize(4, 3)
         self.setStyleSheet(
             f"""
             QMainWindow {{
-                background-color: {MAIN_WINDOW_COLORS['main_background']};
+                background-color: {MAIN_WINDOW_SETTINGS['main_background']};
             }}
             QPushButton {{
-                background-color: {MAIN_WINDOW_COLORS['button_normal']};
-                color: {MAIN_WINDOW_COLORS['button_text']};
-                border: 1px solid {MAIN_WINDOW_COLORS['button_border']};
-                border-radius: 4px;
-                padding: 6px 12px;
-                min-width: 80px;
+                background-color: {MAIN_WINDOW_SETTINGS['button_normal']};
+                color: {MAIN_WINDOW_SETTINGS['button_text']};
+                border: 1px solid {MAIN_WINDOW_SETTINGS['button_border']};
+                border-radius: 6px;
+                padding: 2px;
+                font-size: 14px;
+                font-weight: bold;
             }}
             QPushButton:hover {{
-                background-color: {MAIN_WINDOW_COLORS['button_hover']};
+                background-color: {MAIN_WINDOW_SETTINGS['button_hover']};
+                border: 2px solid {MAIN_WINDOW_SETTINGS['button_border']};
             }}
             QPushButton:pressed {{
-                background-color: {MAIN_WINDOW_COLORS['button_pressed']};
+                background-color: {MAIN_WINDOW_SETTINGS['button_pressed']};
             }}
             QPushButton:disabled {{
-                background-color: {MAIN_WINDOW_COLORS['button_disabled_bg']};
-                color: {MAIN_WINDOW_COLORS['button_disabled_text']};
+                background-color: {MAIN_WINDOW_SETTINGS['button_disabled_bg']};
+                color: {MAIN_WINDOW_SETTINGS['button_disabled_text']};
+                border: 1px solid {MAIN_WINDOW_SETTINGS['button_disabled_text']};
             }}
             """
             )
@@ -75,20 +83,36 @@ class MainWindow(QMainWindow):
         # Create keyboard canvas
         self.canvas = KeyboardCanvas(self.keyboard_manager)
 
-        # Add buttons
-        self.save_btn = QPushButton("Save Layout")
+        # Add icon buttons
+        self.save_btn = QPushButton(" ")
+        self.save_btn.setToolTip("Save Layout")
         self.save_btn.clicked.connect(self.saveLayout)
+        self.save_btn.setFixedSize(30, 30)
+        self.hideable_buttons.append(self.save_btn)
 
-        self.load_btn = QPushButton("Load Layout")
+        self.load_btn = QPushButton(" ")
+        self.load_btn.setToolTip("Load Layout")
         self.load_btn.clicked.connect(self.loadLayout)
+        self.load_btn.setFixedSize(30, 30)
+        self.hideable_buttons.append(self.load_btn)
 
-        self.toggle_mode_btn = QPushButton("Start Visualizer")
+        self.toggle_mode_btn = QPushButton(" ")
+        self.toggle_mode_btn.setToolTip("Start Visualizer")
         self.toggle_mode_btn.clicked.connect(self.toggleMode)
+        self.toggle_mode_btn.setFixedSize(30, 30)
+        self.hideable_buttons.append(self.toggle_mode_btn)
+
+        self.toggle_visibility_btn = QPushButton("  ")
+        self.toggle_visibility_btn.setToolTip("Hide Toolbar")
+        self.toggle_visibility_btn.clicked.connect(self.toggleVisibility)
+        self.toggle_visibility_btn.setFixedSize(30, 30)
 
         # Add buttons to toolbar
         toolbar.addWidget(self.save_btn)
         toolbar.addWidget(self.load_btn)
         toolbar.addWidget(self.toggle_mode_btn)
+        toolbar.addStretch()  # Push buttons to the left
+        toolbar.addWidget(self.toggle_visibility_btn)
 
         # Add layouts to main layout
         layout.addLayout(toolbar)
@@ -104,14 +128,16 @@ class MainWindow(QMainWindow):
         editor_widgets = [self.save_btn, self.load_btn]
 
         if self.canvas.editor_mode:
-            self.toggle_mode_btn.setText("Start Visualizer")
+            self.toggle_mode_btn.setText("")
+            self.toggle_mode_btn.setToolTip("Start Visualizer")
             for widget in editor_widgets:
                 widget.setEnabled(True)
             self.keyboard_manager.stop_monitoring()
             self.canvas.setCursor(Qt.CursorShape.CrossCursor)
             self.state_check_timer.stop()
         else:
-            self.toggle_mode_btn.setText("Stop Visualizer")
+            self.toggle_mode_btn.setText("")
+            self.toggle_mode_btn.setToolTip("Stop Visualizer")
             for widget in editor_widgets:
                 widget.setEnabled(False)
             # Start monitoring with current key scan codes
@@ -139,6 +165,24 @@ class MainWindow(QMainWindow):
             with open(filename, "r") as f:
                 config = json.load(f)
                 self.canvas.loadConfiguration(config)
+
+    def toggleVisibility(self):
+        if self.interface_minimized:
+            # Show all buttons
+            for btn in self.hideable_buttons:
+                btn.show()
+            self.toggle_visibility_btn.setText("  ")
+            self.toggle_visibility_btn.setToolTip("Hide Toolbar")
+            self.toggle_visibility_btn.setFixedSize(30, 30)
+            self.interface_minimized = False
+        else:
+            # Hide all except minimize button
+            for btn in self.hideable_buttons:
+                btn.hide()
+            self.toggle_visibility_btn.setText("  ")
+            self.toggle_visibility_btn.setToolTip("Show Toolbar")
+            self.toggle_visibility_btn.setFixedSize(22, 22)
+            self.interface_minimized = True
 
     def check_keyboard_state(self):
         if not self.canvas.editor_mode:  # Only check states in visualizer mode
