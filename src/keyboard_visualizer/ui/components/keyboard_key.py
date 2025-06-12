@@ -7,8 +7,8 @@ from pathlib import Path
 import json
 import random
 
-from .dialogs import KeyBindDialog
-from ..utils.config import load_key_colors
+from ui.dialogs.settings_dialog import KeyBindDialog
+from utils.config import load_key_colors
 
 KEY_COLORS = load_key_colors()
 

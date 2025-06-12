@@ -12,9 +12,9 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import QTimer, Qt
 
-from .keyboard_canvas import KeyboardCanvas
-from ..core.keyboard_manager import KeyboardManager
-from ..utils.config import load_main_window_settings
+from ui.components.keyboard_canvas import KeyboardCanvas
+from core.keyboard_manager import KeyboardManager
+from utils.config import load_main_window_settings
 
 
 MAIN_WINDOW_SETTINGS = load_main_window_settings()

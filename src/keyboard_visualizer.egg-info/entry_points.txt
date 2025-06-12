@@ -1,0 +1,3 @@
+[console_scripts]
+keyboard-visualizer = keyboard_visualizer.__main__:main
+kviz = keyboard_visualizer.__main__:main

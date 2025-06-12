@@ -4,7 +4,7 @@ from typing import Dict, Any
 
 def get_default_config_path() -> Path:
     """Get the path to the default configuration file bundled with the app."""
-    path = Path(__file__).parent.parent / "default_config.json"
+    path = Path(__file__).parent.parent.parent.parent/ "config/default.json"
     print(f"Default config path: {path}")
     return path
 

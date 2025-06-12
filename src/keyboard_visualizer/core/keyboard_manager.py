@@ -5,8 +5,8 @@ import time
 from pathlib import Path
 import subprocess
 from PyQt6.QtWidgets import QDialog, QMessageBox
-from ..utils.sudo_helper import SudoHelper
-from ..ui.dialogs import PasswordDialog
+from utils.sudo_helper import SudoHelper
+from ui.dialogs.settings_dialog import PasswordDialog
 
 
 class KeyboardManager:
@@ -42,7 +42,8 @@ class KeyboardManager:
             return True
 
         # Create helper script path
-        helper_script = Path(__file__).parent.parent.parent / "keyboard_helper.py"
+        helper_script = Path(__file__).parent.parent / "utils/keyboard_helper.py"
+        print(f"Starting keyboard helper from: {helper_script}")
 
         try:
             # Start the helper process with sudo
@@ -58,6 +59,7 @@ class KeyboardManager:
 
         # If we get here, the helper didn't start properly
         if self.helper_process:
+            print("Helper process did not start correctly.")
             try:
                 self.helper_process.terminate()
             except:
