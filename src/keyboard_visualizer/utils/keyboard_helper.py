@@ -11,16 +11,16 @@ from typing import Dict, List, Optional, Any, Callable
 class KeyboardHelper:
     """
     Helper process for monitoring keyboard input with elevated privileges.
-    
+
     This class runs as a separate process with elevated privileges to monitor
     keyboard input events. It communicates with the main application through
     temporary files, processing commands to wait for key presses or monitor
     specific keys continuously.
-    
+
     The helper supports two main operations:
     1. Single key detection: Wait for any key press and return its information
     2. Continuous monitoring: Monitor specific keys and maintain their state
-    
+
     Attributes:
         tmp_dir (Path): Directory for temporary communication files.
         command_file (Path): File for receiving commands from the main application.
@@ -29,11 +29,11 @@ class KeyboardHelper:
         key_states (Dict[int, bool]): Current state of monitored keys (scan_code -> pressed).
         last_error_time (float): Timestamp of last error to prevent spam logging.
     """
-    
+
     def __init__(self) -> None:
         """
         Initialize the KeyboardHelper.
-        
+
         Sets up the temporary directory structure for inter-process communication,
         clears any existing communication files, creates the running indicator file,
         and initializes key state tracking.
@@ -60,15 +60,15 @@ class KeyboardHelper:
     def wait_for_key(self) -> Optional[Dict[str, Any]]:
         """
         Wait for a single keypress and return its information.
-        
+
         Sets up a keyboard hook to capture the next key press event and returns
         information about the pressed key including its scan code and name.
         This method blocks until a key is pressed.
-        
+
         Returns:
             Optional[Dict[str, Any]]: Dictionary containing 'scan_code' and 'name'
                 of the pressed key, or None if an error occurs.
-                
+
         Note:
             This method unhooks all existing keyboard handlers and sets up a
             temporary hook that removes itself after capturing one key press.
@@ -78,7 +78,7 @@ class KeyboardHelper:
         def on_key(event: keyboard.KeyboardEvent) -> None:
             """
             Internal callback for handling key press events.
-            
+
             Args:
                 event (keyboard.KeyboardEvent): The keyboard event containing key information.
             """
@@ -98,15 +98,15 @@ class KeyboardHelper:
     def start_monitoring(self, scan_codes: List[int]) -> None:
         """
         Start monitoring keys based on their scan codes.
-        
+
         Sets up continuous monitoring of the specified keys, tracking their
         press/release states and writing updates to the response file. This
         method replaces any existing keyboard hooks.
-        
+
         Args:
             scan_codes (List[int]): List of scan codes to monitor. Only key events
                 for these scan codes will be tracked and reported.
-                
+
         Note:
             The key states are continuously updated in the response file as JSON.
             Each monitored scan code maps to a boolean indicating if it's pressed.
@@ -117,7 +117,7 @@ class KeyboardHelper:
         def on_key_event(e: keyboard.KeyboardEvent) -> None:
             """
             Internal callback for handling monitored key events.
-            
+
             Args:
                 e (keyboard.KeyboardEvent): The keyboard event to process.
             """
@@ -135,16 +135,16 @@ class KeyboardHelper:
     def run(self) -> None:
         """
         Main loop to handle commands from the parent process.
-        
+
         Continuously checks for command files and processes them based on their
         command type. Supports 'wait_key', 'monitor', and 'stop_monitor' commands.
         The loop continues until the running file is removed.
-        
+
         Command Types:
         - wait_key: Wait for a single key press and return its information
         - monitor: Start monitoring specified scan codes continuously
         - stop_monitor: Stop all monitoring and clear key states
-        
+
         The method includes error handling and rate limiting for error messages
         to prevent log spam. Cleanup is performed automatically on exit.
         """

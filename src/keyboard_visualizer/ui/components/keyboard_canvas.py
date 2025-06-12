@@ -10,16 +10,16 @@ from keyboard_visualizer.core.keyboard_manager import KeyboardManager
 class KeyboardCanvas(QWidget):
     """
     Canvas widget for displaying and managing keyboard keys in a visual layout.
-    
+
     This widget serves as the main display area for keyboard visualization and editing.
     It supports two modes: editor mode for creating and arranging keys, and visualizer
     mode for real-time key state display with automatic scaling.
-    
+
     The canvas handles key creation, selection, dragging, and scaling operations.
     In editor mode, users can create new keys by clicking and drag existing keys
     around. In visualizer mode, the canvas automatically scales keys to maintain
     aspect ratio when the window is resized.
-    
+
     Attributes:
         keyboard_manager (KeyboardManager): Manager for keyboard input monitoring.
         keys (List[KeyboardKey]): List of all keyboard keys on the canvas.
@@ -32,11 +32,13 @@ class KeyboardCanvas(QWidget):
         key_original_sizes (Dict[KeyboardKey, QSize]): Original sizes of keys for scaling.
         key_original_positions (Dict[KeyboardKey, QPoint]): Original positions of keys for scaling.
     """
-    
-    def __init__(self, keyboard_manager: KeyboardManager, parent: Optional[QWidget] = None) -> None:
+
+    def __init__(
+        self, keyboard_manager: KeyboardManager, parent: Optional[QWidget] = None
+    ) -> None:
         """
         Initialize the KeyboardCanvas.
-        
+
         Args:
             keyboard_manager (KeyboardManager): The keyboard manager instance for handling input.
             parent (Optional[QWidget]): Parent widget, defaults to None.
@@ -62,7 +64,7 @@ class KeyboardCanvas(QWidget):
     def saveOriginalLayout(self) -> None:
         """
         Save the original layout dimensions for scaling operations.
-        
+
         Stores the current canvas size and all key positions and sizes as reference
         points for proportional scaling when the canvas is resized in visualizer mode.
         This method should be called before entering visualizer mode.
@@ -75,14 +77,14 @@ class KeyboardCanvas(QWidget):
     def resizeEvent(self, event: QResizeEvent) -> None:
         """
         Handle canvas resize events with proportional key scaling.
-        
+
         In visualizer mode, automatically scales all keys proportionally to maintain
         the visual layout when the canvas is resized. Uses the smaller of width or
         height scale factors to preserve aspect ratios.
-        
+
         Args:
             event (QResizeEvent): The resize event containing old and new sizes.
-            
+
         Note:
             Scaling only occurs in visualizer mode. In editor mode, keys maintain
             their original sizes and positions.
@@ -116,17 +118,17 @@ class KeyboardCanvas(QWidget):
     def toggleEditorMode(self, enabled: bool) -> None:
         """
         Toggle between editor and visualization modes.
-        
+
         In editor mode:
         - Keys can be created, moved, and edited
         - Keys maintain their original sizes and positions
         - Scaling data is cleared
-        
+
         In visualizer mode:
         - Keys are scaled proportionally with canvas resizing
         - Original layout dimensions are saved for scaling reference
         - Key editing is disabled
-        
+
         Args:
             enabled (bool): True to enable editor mode, False for visualizer mode.
         """
@@ -147,14 +149,14 @@ class KeyboardCanvas(QWidget):
     def mousePressEvent(self, event: QMouseEvent) -> None:
         """
         Handle mouse press events for key creation and selection.
-        
+
         In editor mode, left clicks create new keys through a key binding dialog.
         If Ctrl is not held, existing selections are cleared before creating new keys.
         The new key is centered at the click position.
-        
+
         Args:
             event (QMouseEvent): The mouse press event containing position and button info.
-            
+
         Note:
             Only responds to left mouse button clicks in editor mode.
             Key creation requires successful completion of the key binding dialog.
@@ -185,7 +187,7 @@ class KeyboardCanvas(QWidget):
     def clearSelection(self) -> None:
         """
         Clear selection from all keys on the canvas.
-        
+
         Sets the selected state of all keys to False and triggers a visual update
         to reflect the deselection. This is typically called when starting a new
         selection or when clearing all selections.
@@ -197,11 +199,11 @@ class KeyboardCanvas(QWidget):
     def startDrag(self, offset: QPoint) -> None:
         """
         Start a drag operation for selected keys.
-        
+
         Initializes the drag state by recording the starting position and identifying
         which keys are currently selected for dragging. Stores the initial position
         of each selected key for relative movement calculations.
-        
+
         Args:
             offset (QPoint): The offset from the key's origin to the drag start point.
                 This parameter is currently unused but maintained for API compatibility.
@@ -214,15 +216,15 @@ class KeyboardCanvas(QWidget):
     def updateDragPosition(self, pos: QPoint, source_key: KeyboardKey) -> None:
         """
         Update positions of keys during a drag operation.
-        
+
         Calculates the movement delta from the drag start position and applies it
         to all selected keys. Ensures keys remain within the canvas boundaries
         by clamping their positions.
-        
+
         Args:
             pos (QPoint): The current mouse position (currently unused).
             source_key (KeyboardKey): The key that initiated the drag (currently unused).
-            
+
         Note:
             The pos and source_key parameters are maintained for API compatibility
             but the actual position is calculated from the global cursor position.
@@ -244,7 +246,7 @@ class KeyboardCanvas(QWidget):
     def endDrag(self) -> None:
         """
         End the current drag operation and clean up drag state.
-        
+
         Resets all drag-related flags and clears temporary storage used during
         the drag operation. This method should be called when the drag operation
         is completed or cancelled.
@@ -256,11 +258,11 @@ class KeyboardCanvas(QWidget):
     def removeKey(self, key: KeyboardKey) -> None:
         """
         Remove a key from the canvas.
-        
+
         Removes the specified key from the keys list, clears its parent relationship,
         and schedules it for deletion. This method safely handles cleanup to prevent
         memory leaks and orphaned widgets.
-        
+
         Args:
             key (KeyboardKey): The key to remove from the canvas.
         """
@@ -272,7 +274,7 @@ class KeyboardCanvas(QWidget):
     def clearKeys(self) -> None:
         """
         Remove all keys from the canvas.
-        
+
         Clears all keys from the canvas by removing their parent relationships
         and scheduling them for deletion. This method is typically used when
         loading a new layout or resetting the canvas.
@@ -285,11 +287,11 @@ class KeyboardCanvas(QWidget):
     def getConfiguration(self) -> Dict[str, List[Dict[str, Any]]]:
         """
         Get the current keyboard layout configuration.
-        
+
         Exports the current state of all keys on the canvas as a dictionary
         suitable for saving to a configuration file. Includes key properties
         such as label, key binding, scan code, and position/size information.
-        
+
         Returns:
             Dict[str, List[Dict[str, Any]]]: Configuration dictionary containing
                 a 'keys' list with each key's properties including label, key_bind,
@@ -313,16 +315,16 @@ class KeyboardCanvas(QWidget):
     def loadConfiguration(self, config: Dict[str, List[Dict[str, Any]]]) -> None:
         """
         Load a keyboard layout configuration.
-        
+
         Clears the current canvas and creates new keys based on the provided
         configuration data. Each key is created with the specified properties
         including position, size, label, and scan code.
-        
+
         Args:
             config (Dict[str, List[Dict[str, Any]]]): Configuration dictionary
                 containing a 'keys' list with key properties. Each key should
                 have label, key_bind, scan_code, x, y, width, and height properties.
-                
+
         Note:
             This method will clear all existing keys before loading the new configuration.
             Missing key_bind or scan_code values will default to empty string or None.
