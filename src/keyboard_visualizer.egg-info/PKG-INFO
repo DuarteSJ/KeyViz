@@ -4,10 +4,9 @@ Version: 0.1.0
 Summary: A visual keyboard layout manager and sound feedback system
 Author-email: Your Name <your.email@example.com>
 License: MIT
-Project-URL: Homepage, https://github.com/yourusername/keyboard-visualizer
-Project-URL: Repository, https://github.com/yourusername/keyboard-visualizer
-Project-URL: Issues, https://github.com/yourusername/keyboard-visualizer/issues
-Project-URL: Documentation, https://keyboard-visualizer.readthedocs.io
+Project-URL: Homepage, https://github.com/DuarteSJ/KeyViz
+Project-URL: Repository, https://github.com/DuarteSJ/KeyViz
+Project-URL: Issues, https://github.com/DuarteSJ/KeyViz/issues
 Keywords: keyboard,visualization,layout,sound,typing
 Classifier: Development Status :: 3 - Alpha
 Classifier: Intended Audience :: End Users/Desktop

@@ -52,7 +52,7 @@ kviz = "keyboard_visualizer.__main__:main"
 Homepage = "https://github.com/DuarteSJ/KeyViz"
 Repository = "https://github.com/DuarteSJ/KeyViz"
 Issues = "https://github.com/DuarteSJ/KeyViz/issues"
-Documentation = ""
+# Documentation = ""
 
 # Tool configurations
 [tool.setuptools.packages.find]

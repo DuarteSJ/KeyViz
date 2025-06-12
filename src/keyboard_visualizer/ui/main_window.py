@@ -12,18 +12,17 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import QTimer, Qt
 
-from ui.components.keyboard_canvas import KeyboardCanvas
-from core.keyboard_manager import KeyboardManager
-from utils.config import load_main_window_settings
+from keyboard_visualizer.ui.components.keyboard_canvas import KeyboardCanvas
+from keyboard_visualizer.core.keyboard_manager import KeyboardManager
+from keyboard_visualizer.utils.config import load_main_window_settings
 
 
 MAIN_WINDOW_SETTINGS = load_main_window_settings()
-# print all keys int the loaded json
 print(f"Loaded main window settings: {MAIN_WINDOW_SETTINGS}\n")
 
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, config_path: Path = None, layout_path: Path = None):
         super().__init__()
         self.interface_minimized = False
         self.hideable_buttons = []
@@ -123,6 +122,14 @@ class MainWindow(QMainWindow):
         self.state_check_timer = QTimer(self)
         self.state_check_timer.timeout.connect(self.check_keyboard_state)
         self.state_check_timer.setInterval(16)  # ~60 FPS
+
+        if layout_path:
+            try:
+                with open(layout_path, "r") as f:
+                    config = json.load(f)
+                    self.canvas.loadConfiguration(config)
+            except Exception as e:
+                print(f"Error loading layout: {e}")
 
     def toggleMode(self):
         self.canvas.toggleEditorMode(not self.canvas.editor_mode)

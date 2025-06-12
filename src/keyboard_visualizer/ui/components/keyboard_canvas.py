@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QDialog
 from PyQt6.QtCore import Qt
-from ui.components.keyboard_key import KeyboardKey
-from ui.dialogs.settings_dialog import KeyBindDialog
+from keyboard_visualizer.ui.components.keyboard_key import KeyboardKey
+from keyboard_visualizer.ui.dialogs.settings_dialog import KeyBindDialog
 
 
 class KeyboardCanvas(QWidget):

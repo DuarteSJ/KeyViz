@@ -5,8 +5,8 @@ import time
 from pathlib import Path
 import subprocess
 from PyQt6.QtWidgets import QDialog, QMessageBox
-from utils.sudo_helper import SudoHelper
-from ui.dialogs.settings_dialog import PasswordDialog
+from keyboard_visualizer.utils.sudo_helper import SudoHelper
+from keyboard_visualizer.ui.dialogs.settings_dialog import PasswordDialog
 
 
 class KeyboardManager:

@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import QTimer
 from pathlib import Path
 import json
-from utils.config import load_dialog_colors
+from keyboard_visualizer.utils.config import load_dialog_colors
 
 DIALOG_COLORS = load_dialog_colors()
 
