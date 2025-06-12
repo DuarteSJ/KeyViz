@@ -57,7 +57,7 @@ def validate_file_path(file_path: str) -> Path:
     return path
 
 
-def main():
+def main() -> None:
     """Main entry point for the keyboard visualizer application."""
     args = parse_arguments()
 

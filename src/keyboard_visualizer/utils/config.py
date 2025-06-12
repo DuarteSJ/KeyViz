@@ -85,7 +85,7 @@ def load_dialog_colors() -> Dict[str, str]:
     return colors
 
 
-def create_default_user_config():
+def create_default_user_config() -> None:
     """Create a default user config file based on the app defaults."""
     user_config_path = get_user_config_path()
 
