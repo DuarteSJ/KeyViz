@@ -1,6 +1,7 @@
 import sys
 import json
 from pathlib import Path
+from typing import Optional, List, Dict, Any, Union
 from PyQt6.QtWidgets import (
     QMainWindow,
     QWidget,
@@ -11,6 +12,7 @@ from PyQt6.QtWidgets import (
     QFileDialog,
 )
 from PyQt6.QtCore import QTimer, Qt
+from PyQt6.QtGui import QCloseEvent
 
 from keyboard_visualizer.ui.components.keyboard_canvas import KeyboardCanvas
 from keyboard_visualizer.core.keyboard_manager import KeyboardManager
@@ -22,10 +24,42 @@ print(f"Loaded main window settings: {MAIN_WINDOW_SETTINGS}\n")
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, config_path: Path = None, layout_path: Path = None):
+    """
+    Main application window for the KeyViz keyboard visualizer.
+
+    This class provides the main interface for the keyboard visualization application,
+    including toolbar controls, keyboard canvas, and mode switching between editor
+    and visualizer modes.
+
+    Attributes:
+        interface_minimized (bool): Whether the toolbar interface is minimized.
+        hideable_buttons (List[QPushButton]): List of buttons that can be hidden.
+        keyboard_manager (KeyboardManager): Manager for keyboard input monitoring.
+        canvas (KeyboardCanvas): The keyboard visualization canvas widget.
+        save_btn (QPushButton): Button for saving keyboard layouts.
+        load_btn (QPushButton): Button for loading keyboard layouts.
+        toggle_mode_btn (QPushButton): Button for switching between editor/visualizer modes.
+        toggle_visibility_btn (QPushButton): Button for hiding/showing toolbar.
+        state_check_timer (QTimer): Timer for checking keyboard state updates.
+    """
+
+    def __init__(
+        self, config_path: Optional[Path] = None, layout_path: Optional[Path] = None
+    ) -> None:
+        # TODO: config_path is being ignored for now.
+        """
+        Initialize the MainWindow.
+
+        Args:
+            config_path (Optional[Path]): Path to configuration file (currently unused).
+            layout_path (Optional[Path]): Path to keyboard layout file to load on startup.
+
+        Raises:
+            SystemExit: If keyboard authentication fails or keyboard helper fails to start.
+        """
         super().__init__()
-        self.interface_minimized = False
-        self.hideable_buttons = []
+        self.interface_minimized: bool = False
+        self.hideable_buttons: List[QPushButton] = []
         self.setWindowTitle("KeyViz")
         self.setMinimumSize(4, 3)
         self.setStyleSheet(
@@ -58,7 +92,7 @@ class MainWindow(QMainWindow):
         )
 
         # Initialize keyboard manager
-        self.keyboard_manager = KeyboardManager()
+        self.keyboard_manager: KeyboardManager = KeyboardManager()
 
         # Get authentication
         if not self.keyboard_manager.authenticate():
@@ -81,7 +115,7 @@ class MainWindow(QMainWindow):
         toolbar = QHBoxLayout()
 
         # Create keyboard canvas
-        self.canvas = KeyboardCanvas(self.keyboard_manager)
+        self.canvas: KeyboardCanvas = KeyboardCanvas(self.keyboard_manager)
 
         # Add icon buttons
         self.save_btn = QPushButton(" ")
@@ -119,7 +153,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.canvas)
 
         # Setup state check timer
-        self.state_check_timer = QTimer(self)
+        self.state_check_timer: QTimer = QTimer(self)
         self.state_check_timer.timeout.connect(self.check_keyboard_state)
         self.state_check_timer.setInterval(16)  # ~60 FPS
 
@@ -131,7 +165,22 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 print(f"Error loading layout: {e}")
 
-    def toggleMode(self):
+    def toggleMode(self) -> None:
+        """
+        Toggle between editor mode and visualizer mode.
+
+        In editor mode:
+        - Keyboard monitoring is disabled
+        - Save/load buttons are enabled
+        - Cursor changes to crosshair for editing
+        - State checking timer is stopped
+
+        In visualizer mode:
+        - Keyboard monitoring is enabled for configured keys
+        - Save/load buttons are disabled
+        - Cursor changes to arrow
+        - State checking timer is started
+        """
         self.canvas.toggleEditorMode(not self.canvas.editor_mode)
         editor_widgets = [self.save_btn, self.load_btn]
 
@@ -157,7 +206,14 @@ class MainWindow(QMainWindow):
                 self.state_check_timer.start()
             self.canvas.setCursor(Qt.CursorShape.ArrowCursor)
 
-    def saveLayout(self):
+    def saveLayout(self) -> None:
+        """
+        Open a file dialog to save the current keyboard layout configuration.
+
+        Prompts the user to select a location and filename for saving the
+        keyboard layout as a JSON file. The configuration is obtained from
+        the canvas and saved to the selected file.
+        """
         filename, _ = QFileDialog.getSaveFileName(
             self, "Save Layout", "", "JSON Files (*.json)"
         )
@@ -165,7 +221,14 @@ class MainWindow(QMainWindow):
             with open(filename, "w") as f:
                 json.dump(self.canvas.getConfiguration(), f)
 
-    def loadLayout(self):
+    def loadLayout(self) -> None:
+        """
+        Open a file dialog to load a keyboard layout configuration.
+
+        Prompts the user to select a JSON file containing a keyboard layout
+        configuration. The selected configuration is loaded into the canvas,
+        replacing the current layout.
+        """
         filename, _ = QFileDialog.getOpenFileName(
             self, "Load Layout", "", "JSON Files (*.json)"
         )
@@ -174,7 +237,20 @@ class MainWindow(QMainWindow):
                 config = json.load(f)
                 self.canvas.loadConfiguration(config)
 
-    def toggleVisibility(self):
+    def toggleVisibility(self) -> None:
+        """
+        Toggle the visibility of the toolbar buttons.
+
+        When minimized:
+        - Hides all buttons except the visibility toggle button
+        - Shrinks the visibility toggle button
+        - Changes tooltip to "Show Toolbar"
+
+        When expanded:
+        - Shows all previously hidden buttons
+        - Restores normal size for visibility toggle button
+        - Changes tooltip to "Hide Toolbar"
+        """
         if self.interface_minimized:
             # Show all buttons
             for btn in self.hideable_buttons:
@@ -192,10 +268,29 @@ class MainWindow(QMainWindow):
             self.toggle_visibility_btn.setFixedSize(22, 22)
             self.interface_minimized = True
 
-    def check_keyboard_state(self):
+    def check_keyboard_state(self) -> None:
+        """
+        Check and update keyboard key states in visualizer mode.
+
+        This method runs at approximately 60 FPS when the state check timer
+        is active. It retrieves current key states from the keyboard manager
+        and updates the visual representation of keys on the canvas.
+
+        The method handles:
+        - Converting scan codes to appropriate types
+        - Triggering sound effects when keys are pressed
+        - Updating visual state of keys
+        - Error handling for invalid scan codes
+
+        Note:
+            Only executes when not in editor mode to avoid interfering
+            with layout editing.
+        """
         if not self.canvas.editor_mode:  # Only check states in visualizer mode
             try:
-                key_states = self.keyboard_manager.get_key_states()
+                key_states: Dict[Union[str, int], bool] = (
+                    self.keyboard_manager.get_key_states()
+                )
                 key_map = {
                     key.scan_code: key
                     for key in self.canvas.keys
@@ -219,7 +314,18 @@ class MainWindow(QMainWindow):
             except Exception as e:
                 print(f"Error checking keyboard state: {e}")
 
-    def closeEvent(self, event):
+    def closeEvent(self, event: QCloseEvent) -> None:
+        """
+        Handle the window close event.
+
+        Performs cleanup operations before the window closes:
+        - Stops the state check timer
+        - Stops the keyboard manager
+        - Accepts the close event
+
+        Args:
+            event (QCloseEvent): The close event object.
+        """
         self.state_check_timer.stop()
         self.keyboard_manager.stop()
         event.accept()

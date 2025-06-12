@@ -1,9 +1,18 @@
 from PyQt6.QtWidgets import QWidget, QInputDialog, QDialog
 from PyQt6.QtCore import Qt, QPoint, QRect
-from PyQt6.QtGui import QPainter, QColor, QPen, QPainterPath, QRadialGradient
+from PyQt6.QtGui import (
+    QPainter,
+    QColor,
+    QPen,
+    QPainterPath,
+    QRadialGradient,
+    QPaintEvent,
+    QMouseEvent,
+)
 from PyQt6.QtMultimedia import QSoundEffect
 from PyQt6.QtCore import QUrl
 from pathlib import Path
+from typing import Optional
 import json
 import random
 
@@ -14,42 +23,121 @@ KEY_COLORS = load_key_colors()
 
 
 class KeyboardKey(QWidget):
-    def __init__(self, label="", key_bind="", scan_code=None, parent=None):
+    """
+    A customizable keyboard key widget for the KeyViz keyboard visualizer.
+
+    This class represents an individual keyboard key that can be displayed, edited,
+    resized, moved, and interacted with. It supports both editor mode (for layout
+    design) and visualizer mode (for real-time key press visualization).
+
+    Features:
+    - Visual representation with customizable colors and effects
+    - Interactive editing (drag, resize, relabel)
+    - Sound effects when pressed
+    - Pressed state visualization with glow effects
+    - Selection state for multi-key operations
+
+    Attributes:
+        label (str): The display text shown on the key.
+        key_bind (str): The key binding identifier.
+        scan_code (Optional[int]): The scan code for keyboard monitoring.
+        pressed (bool): Whether the key is currently pressed.
+        selected (bool): Whether the key is selected in editor mode.
+        dragging (bool): Whether the key is currently being dragged.
+        resizing (bool): Whether the key is currently being resized.
+        resize_handle (Optional[str]): Which resize handle is being used.
+        offset (QPoint): Mouse offset for drag/resize operations.
+        min_size (int): Minimum size constraint for the key.
+        sound_effect (QSoundEffect): Audio effect played when key is pressed.
+    """
+
+    def __init__(
+        self,
+        label: str = "",
+        key_bind: str = "",
+        scan_code: Optional[int] = None,
+        parent: Optional[QWidget] = None,
+    ) -> None:
+        """
+        Initialize a KeyboardKey widget.
+
+        Args:
+            label (str, optional): Display text for the key. Defaults to "".
+            key_bind (str, optional): Key binding identifier. Defaults to "".
+            scan_code (Optional[int], optional): Scan code for keyboard monitoring. Defaults to None.
+            parent (QWidget, optional): Parent widget. Defaults to None.
+        """
         super().__init__(parent)
-        self.label = label
-        self.key_bind = key_bind
-        self.scan_code = scan_code
-        self.pressed = False
-        self.selected = False
+        self.label: str = label
+        self.key_bind: str = key_bind
+        self.scan_code: Optional[int] = scan_code
+        self.pressed: bool = False
+        self.selected: bool = False
         self.setFixedSize(40, 40)
 
-        self.dragging = False
-        self.resizing = False
-        self.resize_handle = None
-        self.offset = QPoint()
-        self.min_size = 30
+        self.dragging: bool = False
+        self.resizing: bool = False
+        self.resize_handle: Optional[str] = None
+        self.offset: QPoint = QPoint()
+        self.min_size: int = 30
 
         self.setMouseTracking(True)
-        self.sound_effect = self.setSoundEffect(key_bind)
+        self.sound_effect: QSoundEffect = self.setSoundEffect(key_bind)
 
-    def setSoundEffect(self, key_bind):
-        sound_path = Path(__file__).parent.parent.parent / "assets/sounds/keys" / f"{key_bind}.wav"
-        print(f"\n\n\nLoading sound effect from: {sound_path}")
+    def setSoundEffect(self, key_bind: str) -> QSoundEffect:
+        """
+        Set up the sound effect for this key.
+
+        Attempts to load a sound file based on the key binding. If the specific
+        sound doesn't exist, falls back to a random letter sound, and finally
+        to the 'a' key sound as a last resort.
+
+        Args:
+            key_bind (str): The key binding identifier to find a sound for.
+
+        Returns:
+            QSoundEffect: Configured sound effect object ready for playback.
+        """
+        sound_path = (
+            Path(__file__).parent.parent.parent
+            / "assets/sounds/keys"
+            / f"{key_bind}.wav"
+        )
         if not sound_path.exists():
             # choose random letter of the alphabet to replace the sound
             choice = random.choice("abcdefghijklmnopqrstuvwxyz")
             sound_path = (
-                Path(__file__).parent.parent.parent / "assets/sounds/keys" / f"{choice}.wav"
+                Path(__file__).parent.parent.parent
+                / "assets/sounds/keys"
+                / f"{choice}.wav"
             )
             if not sound_path.exists():
                 # default to the sound of a if the chosen sound also does not exist
-                sound_path = Path(__file__).parent.parent.parent / "assets/sounds/keys" / "a.wav"
+                sound_path = (
+                    Path(__file__).parent.parent.parent / "assets/sounds/keys" / "a.wav"
+                )
         self.sound_effect = QSoundEffect()
         self.sound_effect.setSource(QUrl.fromLocalFile(str(sound_path)))
         self.sound_effect.setVolume(0.3)
         return self.sound_effect
 
-    def paintEvent(self, event):
+    def paintEvent(self, event: QPaintEvent) -> None:
+        """
+        Paint the key widget with appropriate visual styling.
+
+        Handles rendering of:
+        - Key face with rounded corners and appropriate colors
+        - Pressed state with radial glow effect
+        - Selected state highlighting
+        - Text label with shadow effects
+        - Resize handles when in editor mode and selected
+
+        The appearance adapts based on key state (normal, selected, pressed)
+        and scales appropriately with key size changes.
+
+        Args:
+            event (QPaintEvent): The paint event (unused but required by Qt).
+        """
         parent = self.parent()
         if parent is None:
             return
@@ -143,7 +231,20 @@ class KeyboardKey(QWidget):
                 handle_color,
             )
 
-    def getResizeHandle(self, pos):
+    def getResizeHandle(self, pos: QPoint) -> Optional[str]:
+        """
+        Determine which resize handle is at the given position.
+
+        Checks if the mouse position is over one of the four corner resize
+        handles when the key is selected in editor mode.
+
+        Args:
+            pos (QPoint): Mouse position relative to the key widget.
+
+        Returns:
+            Optional[str]: Handle identifier ("top-left", "top-right", "bottom-left",
+                          "bottom-right") or None if not over a handle.
+        """
         handle_size = 6
         if QRect(0, 0, handle_size, handle_size).contains(pos):
             return "top-left"
@@ -164,7 +265,19 @@ class KeyboardKey(QWidget):
             return "bottom-right"
         return None
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        """
+        Handle mouse press events for key interaction.
+
+        In editor mode:
+        - Left click on resize handle: Start resizing operation
+        - Left click with Ctrl: Toggle selection state
+        - Left click: Select key and start dragging
+        - Right click: Remove key from layout
+
+        Args:
+            event (QMouseEvent): Mouse event containing button, position, and modifiers.
+        """
         parent = self.parent()
         if parent is None:
             return
@@ -190,7 +303,16 @@ class KeyboardKey(QWidget):
         elif event.button() == Qt.MouseButton.RightButton:
             parent.removeKey(self)
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:
+        """
+        Handle mouse release events to end drag/resize operations.
+
+        Stops any active dragging or resizing operation and notifies
+        the parent widget that the drag operation has ended.
+
+        Args:
+            event (QMouseEvent): Mouse event containing button information.
+        """
         parent = self.parent()
         if parent and event.button() == Qt.MouseButton.LeftButton:
             self.dragging = False
@@ -198,7 +320,20 @@ class KeyboardKey(QWidget):
             self.resize_handle = None
             parent.endDrag()
 
-    def mouseMoveEvent(self, event):
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        """
+        Handle mouse move events for drag, resize, and cursor updates.
+
+        Behavior depends on current operation:
+        - Resizing: Updates key size based on handle being dragged
+        - Dragging: Updates key position, handles multi-key selection
+        - Neither: Updates cursor based on hover over resize handles
+
+        Maintains minimum size constraints and boundary checks during operations.
+
+        Args:
+            event (QMouseEvent): Mouse event containing current position.
+        """
         parent = self.parent()
         if parent is None or not parent.editor_mode:
             return
@@ -245,7 +380,19 @@ class KeyboardKey(QWidget):
             else:
                 self.setCursor(Qt.CursorShape.ArrowCursor)
 
-    def mouseDoubleClickEvent(self, event):
+    def mouseDoubleClickEvent(self, event: QMouseEvent) -> None:
+        """
+        Handle double-click events to edit key properties.
+
+        In editor mode, double-clicking opens dialogs to:
+        1. Edit the key's display label
+        2. Configure the key binding and scan code
+
+        The key is updated with new values if the user confirms the changes.
+
+        Args:
+            event (QMouseEvent): Mouse event (unused but required by Qt).
+        """
         parent = self.parent()
         if parent and parent.editor_mode:
             new_label, ok = QInputDialog.getText(
@@ -259,8 +406,16 @@ class KeyboardKey(QWidget):
                     self.scan_code = dialog.key_info["scan_code"]
                 self.update()
 
-    def playSound(self):
-        """Play a sound when the key is pressed."""
+    def playSound(self) -> None:
+        """
+        Play the sound effect for this key.
+
+        Attempts to play the configured sound effect. If the sound is not
+        loaded, prints an error message instead of playing.
+
+        This method is typically called when a key press is detected
+        in visualizer mode.
+        """
         if self.sound_effect.isLoaded():
             self.sound_effect.play()
         else:
