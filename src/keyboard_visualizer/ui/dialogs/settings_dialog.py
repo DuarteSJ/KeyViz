@@ -46,27 +46,28 @@ DIALOG_STYLE = f"""
     }}
 """
 
+
 class PasswordDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Authentication Required")
         self.setModal(True)
         self.setStyleSheet(DIALOG_STYLE)
-        
+
         layout = QVBoxLayout()
-        
+
         # Add explanation label
         label = QLabel(
             "KeyViz needs elevated privileges to monitor keyboard input.\n"
             "Please enter your sudo password:"
         )
         layout.addWidget(label)
-        
+
         # Add password field
         self.password_field = QLineEdit()
         self.password_field.setEchoMode(QLineEdit.EchoMode.Password)
         layout.addWidget(self.password_field)
-        
+
         # Add buttons
         button_layout = QHBoxLayout()
         ok_button = QPushButton("OK")
@@ -74,13 +75,13 @@ class PasswordDialog(QDialog):
         button_layout.addWidget(ok_button)
         button_layout.addWidget(cancel_button)
         layout.addLayout(button_layout)
-        
+
         # Connect buttons
         ok_button.clicked.connect(self.accept)
         cancel_button.clicked.connect(self.reject)
-        
+
         self.setLayout(layout)
-    
+
     def get_password(self):
         return self.password_field.text()
 
@@ -91,21 +92,21 @@ class KeyBindDialog(QDialog):
         self.setWindowTitle("Press a Key")
         self.setModal(True)
         self.setStyleSheet(DIALOG_STYLE)
-        
+
         self.keyboard_manager = keyboard_manager
         self.layout = QVBoxLayout()
-        
+
         self.label = QLabel("Press the key you want to bind...")
         self.layout.addWidget(self.label)
-        
+
         self.key_info = None
         self.setLayout(self.layout)
-        
+
         # Start key detection
         self.timer = QTimer()
         self.timer.timeout.connect(self.check_key)
         self.timer.start(100)
-    
+
     def check_key(self):
         key_info = self.keyboard_manager.wait_for_key()
         if key_info:

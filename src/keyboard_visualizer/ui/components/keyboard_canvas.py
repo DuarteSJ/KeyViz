@@ -33,25 +33,25 @@ class KeyboardCanvas(QWidget):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        
+
         if not self.editor_mode and self.keys:
             if not self.base_size:
                 self.saveOriginalLayout()
-            
+
             # Calculate scale factors
             width_scale = event.size().width() / self.base_size.width()
             height_scale = event.size().height() / self.base_size.height()
-            
+
             # Use the smaller scale to maintain aspect ratio
             scale = min(width_scale, height_scale)
-            
+
             for key in self.keys:
                 # Scale size
                 original_size = self.key_original_sizes[key]
                 new_width = int(original_size.width() * scale)
                 new_height = int(original_size.height() * scale)
                 key.setFixedSize(new_width, new_height)
-                
+
                 # Scale position
                 original_pos = self.key_original_positions[key]
                 new_x = int(original_pos.x() * scale)

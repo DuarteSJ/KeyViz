@@ -49,10 +49,10 @@ keyboard-visualizer = "keyboard_visualizer.__main__:main"
 kviz = "keyboard_visualizer.__main__:main"
 
 [project.urls]
-Homepage = "https://github.com/yourusername/keyboard-visualizer"
-Repository = "https://github.com/yourusername/keyboard-visualizer"
-Issues = "https://github.com/yourusername/keyboard-visualizer/issues"
-Documentation = "https://keyboard-visualizer.readthedocs.io"
+Homepage = "https://github.com/DuarteSJ/KeyViz"
+Repository = "https://github.com/DuarteSJ/KeyViz"
+Issues = "https://github.com/DuarteSJ/KeyViz/issues"
+Documentation = ""
 
 # Tool configurations
 [tool.setuptools.packages.find]

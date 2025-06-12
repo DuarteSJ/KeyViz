@@ -12,6 +12,7 @@ from utils.config import load_key_colors
 
 KEY_COLORS = load_key_colors()
 
+
 class KeyboardKey(QWidget):
     def __init__(self, label="", key_bind="", scan_code=None, parent=None):
         super().__init__(parent)
@@ -31,14 +32,14 @@ class KeyboardKey(QWidget):
         self.setMouseTracking(True)
         self.sound_effect = self.setSoundEffect(key_bind)
 
-
-
     def setSoundEffect(self, key_bind):
         sound_path = Path(__file__).parent.parent.parent / "sounds" / f"{key_bind}.wav"
         if not sound_path.exists():
             # choose random letter of the alphabet to replace the sound
             choice = random.choice("abcdefghijklmnopqrstuvwxyz")
-            sound_path = Path(__file__).parent.parent.parent / "sounds" / f"{choice}.wav"
+            sound_path = (
+                Path(__file__).parent.parent.parent / "sounds" / f"{choice}.wav"
+            )
             if not sound_path.exists():
                 # default to the sound of a if the chosen sound also does not exist
                 sound_path = Path(__file__).parent.parent.parent / "sounds" / "a.wav"
@@ -122,7 +123,9 @@ class KeyboardKey(QWidget):
         painter.drawText(int(x), int(y), self.label)
 
         if self.selected and parent.editor_mode:
-            handle_size = min(6, int(self.width() * 0.15))  # Scale handle size with key size
+            handle_size = min(
+                6, int(self.width() * 0.15)
+            )  # Scale handle size with key size
             handle_color = QColor(KEY_COLORS["resize_handle"])
             painter.fillRect(0, 0, handle_size, handle_size, handle_color)
             painter.fillRect(

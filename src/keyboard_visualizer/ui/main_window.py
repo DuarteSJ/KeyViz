@@ -21,6 +21,7 @@ MAIN_WINDOW_SETTINGS = load_main_window_settings()
 # print all keys int the loaded json
 print(f"Loaded main window settings: {MAIN_WINDOW_SETTINGS}\n")
 
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -55,7 +56,7 @@ class MainWindow(QMainWindow):
                 border: 1px solid {MAIN_WINDOW_SETTINGS['button_disabled_text']};
             }}
             """
-            )
+        )
 
         # Initialize keyboard manager
         self.keyboard_manager = KeyboardManager()
